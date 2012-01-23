@@ -1566,21 +1566,33 @@ def readmat(filename):
         return P
 def readtrj(filename):
     """
-    Read an external file and return a tuple.
-    
-    The file must be of the form:
-    
-    x
-    y
-    z
-    .
-    .
-    .
+    In the case the :class:`Chain` instance must be created from a finite chain of
+    states, the transition matrix is not fully defined.
+    The function defines the transition probabilities as the maximum likelihood
+    probabilities calculated along the chain. Having the file ``/mypath/trj`` with the following
+    format::
+        
+        1
+        1
+        1
+        2
+        1
+        3
+        
+    the :class:`Chain` instance defined from that chain is:
 
-    Example
-    -------
     >>> t = pykov.readtrj('/mypath/trj')
-    >>> p, T = maximum_likelihood_probabilities(t)
+    >>> t
+    (1, 1, 1, 2, 1, 3)
+    >>> p, P = maximum_likelihood_probabilities(t,lag_time=1, separator='0')
+    >>> p
+    {1: 0.6666666666666666, 2: 0.16666666666666666, 3: 0.16666666666666666}
+    >>> P
+    {(1, 2): 0.25, (1, 3): 0.25, (1, 1): 0.5, (2, 1): 1.0, (3, 3): 1.0}
+    >>> type(P)
+    <class 'pykov.Chain'>
+    >>> type(p)
+    <class 'pykov.Vector'>
     """
     with open(filename) as f:
         return tuple(line.strip() for line in f)
