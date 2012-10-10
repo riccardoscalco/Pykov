@@ -37,7 +37,7 @@ import numpy
 import pysparse
 #import networkx
 
-__date__ = 'Jan 2012'
+__date__ = 'Sept 2012'
 
 __version__ = 1.0
 
@@ -45,7 +45,7 @@ __license__ = 'GNU General Public License Version 3'
 
 __authors__ = 'Riccardo Scalco'
 
-__many_thanks_to__ = 'Sandra Steiner'
+__many_thanks_to__ = 'Sandra Steiner, Nicky Van Foreest'
 
 def _del_cache(fn):
     """
@@ -133,7 +133,7 @@ class Vector(dict):
         >>> q
         {'C': 0.4, 'B': 0.6}
         """
-        if value:
+        if value > numpy.finfo(numpy.float).eps:
             dict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
@@ -152,9 +152,7 @@ class Vector(dict):
         {'A': 0.42, 'B': 0.3}
         """
         if isinstance(M,int) or isinstance(M,float):
-            result = Vector()
-            for state, value in self.iteritems():
-                result[state] = value * M
+            return self.__rmul__(M)
         if isinstance(M, Matrix):
             e2p, p2e = M._el2pos_() 
             x = self._toarray(e2p)
@@ -415,7 +413,7 @@ class Matrix(dict):
         >>> T.states()
         set(['A', 'B'])
         """
-        if value:
+        if value > numpy.finfo(numpy.float).eps:
             dict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
@@ -1373,7 +1371,7 @@ class Chain(Matrix):
         Return the Kemeny constant of the transition matrix.
         
         >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-        >>> T.Kemeny_constant()
+        >>> T.kemeny_constant()
         1.7692307692307712
         """
         Z = self.fundamental_matrix()
@@ -1734,6 +1732,9 @@ def _remove_dead_branch(transitions_list):
             transitions_list.append((head, head))
     return None
 def _machineEpsilon(func=float):
+    """
+    should be the same result of: numpy.finfo(numpy.float).eps
+    """
     machine_epsilon = func(1)
     while func(1)+func(machine_epsilon) != func(1):
         machine_epsilon_last = machine_epsilon
