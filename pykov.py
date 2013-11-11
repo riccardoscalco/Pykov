@@ -35,6 +35,7 @@ import math
 
 import numpy
 import pysparse
+import pysparse.direct
 #import networkx
 
 __date__ = 'Sept 2012'
@@ -1057,11 +1058,11 @@ class Chain(Matrix):
             x = numpy.zeros(m)
             b[-1] = 1.
             try:
-                LU = pysparse.umfpack.factorize(M)
+                LU = pysparse.direct.umfpack.factorize(M)
             except SystemError:  #not elegant this singular matrix error..
                 # really dirty trick ??
                 M[0,0] = M[0,0] + _machineEpsilon()
-                LU = pysparse.umfpack.factorize(M)
+                LU = pysparse.direct.umfpack.factorize(M)
             LU.solve(b, x)
             res = Vector()
             res._fromarray(x, e2p)
