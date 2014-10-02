@@ -38,9 +38,9 @@ import pysparse
 #import pysparse.direct
 #import networkx
 
-__date__ = 'Sept 2012'
+__date__ = 'Oct 2014'
 
-__version__ = 1.0
+__version__ = 1.1
 
 __license__ = 'GNU General Public License Version 3' 
 
