@@ -35,7 +35,7 @@ import math
 
 import numpy
 import pysparse
-import pysparse.direct
+#import pysparse.direct
 #import networkx
 
 __date__ = 'Sept 2012'
@@ -134,7 +134,7 @@ class Vector(dict):
         >>> q
         {'C': 0.4, 'B': 0.6}
         """
-        if value > numpy.finfo(numpy.float).eps:
+        if abs(value) > numpy.finfo(numpy.float).eps:
             dict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
@@ -414,7 +414,7 @@ class Matrix(dict):
         >>> T.states()
         set(['A', 'B'])
         """
-        if value > numpy.finfo(numpy.float).eps:
+        if abs(value) > numpy.finfo(numpy.float).eps:
             dict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
@@ -1058,11 +1058,13 @@ class Chain(Matrix):
             x = numpy.zeros(m)
             b[-1] = 1.
             try:
-                LU = pysparse.direct.umfpack.factorize(M)
+                #LU = pysparse.direct.umfpack.factorize(M)
+                LU = pysparse.umfpack.factorize(M)
             except SystemError:  #not elegant this singular matrix error..
                 # really dirty trick ??
                 M[0,0] = M[0,0] + _machineEpsilon()
-                LU = pysparse.direct.umfpack.factorize(M)
+                #LU = pysparse.direct.umfpack.factorize(M)
+                LU = pysparse.umfpack.factorize(M)
             LU.solve(b, x)
             res = Vector()
             res._fromarray(x, e2p)
