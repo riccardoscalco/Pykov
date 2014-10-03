@@ -2,7 +2,7 @@
 
 from distutils.core import setup
 setup(name='pykov',
-      version='1.0',
+      version='1.1',
       description='A Markov Chain Python module',
       author='Riccardo Scalco',
       author_email='riccardo.scalco@gmail.com',

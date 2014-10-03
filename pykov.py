@@ -608,7 +608,7 @@ class Matrix(dict):
         {'A': 0.7, 'B': 1.0}
         """
         try:
-            if key:
+            if key is not None:
                 return self._pred[key]
             else:
                 return self._pred
@@ -616,7 +616,7 @@ class Matrix(dict):
             self._pred = dict([(state, Vector()) for state in self.states()])
             for link, probability in  self.iteritems():
                 self._pred[link[1]][link[0]] = probability
-            if key:
+            if key is not None:
                 return self._pred[key]
             else:
                 return self._pred
@@ -632,7 +632,7 @@ class Matrix(dict):
         {'A': 0.7, 'B': 0.3}
         """
         try:
-            if key:
+            if key is not None:
                 return self._succ[key]
             else:
                 return self._succ
@@ -640,7 +640,7 @@ class Matrix(dict):
             self._succ = dict([(state, Vector()) for state in self.states()])
             for link, probability in  self.iteritems():
                 self._succ[link[0]][link[1]] = probability
-            if key:
+            if key is not None:
                 return self._succ[key]
             else:
                 return self._succ
