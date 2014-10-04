@@ -1,6 +1,0 @@
-Pykov is a Python module for the creation, manipulation and analysis of finite
-Markov chains.
-
-Documentation is available at: http://riccardoscalco.github.io/Pykov/.
-Please note that pykov depends on pysparse 1.1.1, recent versions of pysparse are not compatible.
-

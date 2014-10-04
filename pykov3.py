@@ -2,7 +2,7 @@
 
 # PyKov is Python package for the creation, manipulation and study of Markov
 # Chains.
-# Copyright (C) 2011  Riccardo Scalco
+# Copyright (C) 2014  Riccardo Scalco
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,11 +34,14 @@ import random
 import math
 
 import numpy
-import pysparse
+import scipy.sparse as ss
+import scipy.sparse.linalg as ssl
+
+#import pysparse
 #import pysparse.direct
 #import networkx
 
-__date__ = 'Oct 2014'
+__date__ = 'Nov 2014'
 
 __version__ = 1.1
 
@@ -117,7 +120,7 @@ class Vector(dict):
         0.4
         >>> q['Z']
         0.0
-        >>> 'Z' in q
+        >>> 
         False
         """
         try:
@@ -157,14 +160,14 @@ class Vector(dict):
         if isinstance(M, Matrix):
             e2p, p2e = M._el2pos_() 
             x = self._toarray(e2p)
-            y = numpy.zeros(len(x))
-            M._ll_mat_(e2p).matvec_transp(x, y)
+            A = M._dok_(e2p).tocsr().transpose()
+            y = A.dot(x)
             result = Vector()
             result._fromarray(y, e2p)
             return result
         elif isinstance(M, Vector):
             result = 0
-            for state, value in self.iteritems():
+            for state, value in self.items():
                 result += value * M[state]
             return result
         else:
@@ -178,7 +181,7 @@ class Vector(dict):
         """
         if isinstance(M,int) or isinstance(M,float):
             result = Vector()
-            for state, value in self.iteritems():
+            for state, value in self.items():
                 result[state] = value * M
             return result
         else:
@@ -225,7 +228,7 @@ class Vector(dict):
         array([ 0.7,  0.3])
         """
         p = numpy.zeros(len(el2pos))
-        for key, value in self.iteritems():
+        for key, value in self.items():
             p[el2pos[key]] = value
         return p
     def _fromarray(self, arr, el2pos):
@@ -237,12 +240,12 @@ class Vector(dict):
         >>> p
         {'A': 0.3, 'B': 0.7}
         """
-        for elem, pos in el2pos.iteritems():
+        for elem, pos in el2pos.items():
             self[elem] = arr[pos]
         return None
     def sort(self, reverse=False):
         """
-        Sort according the probability.
+        List of (state,probability) sorted according the probability.
         
         >>> p = pykov.Vector({'A':.3, 'B':.1, 'C':.6})
         >>> p.sort()
@@ -250,7 +253,7 @@ class Vector(dict):
         >>> p.sort(reverse=True)
         [('C', 0.6), ('A', 0.3), ('B', 0.1)]
         """
-        res = self.items()
+        res = list(self.items())
         res.sort(key=lambda lst: lst[1], reverse=reverse)
         return res
     def normalize(self):
@@ -278,7 +281,7 @@ class Vector(dict):
            `Kevin Parks recipe <http://code.activestate.com/recipes/117241/>`_
         """
         n = random.uniform(0, 1)
-        for state, prob in self.iteritems():
+        for state, prob in self.items():
             if n < prob:
                 break
             n = n - prob
@@ -301,7 +304,7 @@ class Vector(dict):
         >>> p.entropy()
         0.6108643020548935
         """
-        return -sum([v*math.log(v) for v in self.itervalues()])
+        return -sum([v*math.log(v) for v in self.values()])
     def relative_entropy(self,p):
         """
         Return the Kullback-Leibler distance.
@@ -342,8 +345,8 @@ class Vector(dict):
         >>> p.sum()
         1.0
         """
-        return float(sum(self.itervalues()))
-    def dist(self, p):
+        return float(sum(self.values()))
+    def dist(self, v):
         """
         Return the distance between the two probability vectors.
         
@@ -380,7 +383,7 @@ class Matrix(dict):
         0.3
         >>> T['A','B']
         0.3
-        >>> T['B','B']
+        >>> 
         0.0
         """
         try:
@@ -406,13 +409,13 @@ class Matrix(dict):
 
         >>> T = pykov.Matrix({('A','B'): 3, ('A','A'): 7, ('B','A'): .1})
         >>> T.states()
-        set(['A', 'B'])
+        {'A', 'B'}
         >>> T['A','C']=1
         >>> T.states()
-        set(['A', 'C', 'B'])
+        {'A', 'B', 'C'}
         >>> T['A','C']=0
         >>> T.states()
-        set(['A', 'B'])
+        {'A', 'B'}
         """
         if abs(value) > numpy.finfo(numpy.float).eps:
             dict.__setitem__(self, key, value)
@@ -505,24 +508,23 @@ class Matrix(dict):
         {('B', 'A'): 1.0, ('A', 'B'): 0.3, ('A', 'A'): 0.7}
         """
         return Matrix(self)
-    def _ll_mat_(self, el2pos, method=''):
+    def _dok_(self, el2pos, method=''):
         """
         """
         m = len(el2pos)
-        n = len(self)
-        ll_mat = pysparse.spmatrix.ll_mat(m, m, n)
+        S = ss.dok_matrix((m,m))
         if method == '':
-            for k, v in self.iteritems():
+            for k, v in self.items():
                 i = el2pos[k[0]]
                 j = el2pos[k[1]]
-                ll_mat[i,j] = float(v)
+                S[i,j] = float(v)
         elif method == 'transpose':
-            for k, v in self.iteritems():
+            for k, v in self.items():
                 i = el2pos[k[0]]
                 j = el2pos[k[1]]
-                ll_mat[j,i] = float(v)
-        return ll_mat
-    def _from_ll_mat_(self, mat, pos2el):
+                S[j,i] = float(v)
+        return S
+    def _from_dok_(self, mat, pos2el):
         """
         """
         for ii, val in mat.items():
@@ -539,7 +541,7 @@ class Matrix(dict):
         """
         m = len(el2pos)
         T = numpy.matrix(numpy.zeros((m, m)))
-        for k, v in self.iteritems():
+        for k, v in self.items():
             T[el2pos[k[0]], el2pos[k[1]]] = v
         return T
     
@@ -588,7 +590,7 @@ class Matrix(dict):
         pykov.PykovError: 'Zero links from node C'
         """
         s = {}
-        for k, v in self.succ().iteritems():
+        for k, v in self.succ().items():
             summ = float(sum(v.values()))
             if summ:
                 s[k] = summ
@@ -614,7 +616,7 @@ class Matrix(dict):
                 return self._pred
         except AttributeError:
             self._pred = dict([(state, Vector()) for state in self.states()])
-            for link, probability in  self.iteritems():
+            for link, probability in  self.items():
                 self._pred[link[1]][link[0]] = probability
             if key is not None:
                 return self._pred[key]
@@ -638,7 +640,7 @@ class Matrix(dict):
                 return self._succ
         except AttributeError:
             self._succ = dict([(state, Vector()) for state in self.states()])
-            for link, probability in  self.iteritems():
+            for link, probability in  self.items():
                 self._succ[link[0]][link[1]] = probability
             if key is not None:
                 return self._succ[key]
@@ -658,7 +660,7 @@ class Matrix(dict):
 #        >>> Z
 #        {('A', 'A'): 0.7}
 #        """
-#        return Matrix(dict([(key, value) for key, value in self.iteritems() if
+#        return Matrix(dict([(key, value) for key, value in self.items() if
 #               state not in key]))
     def remove(self, states):
         """
@@ -675,10 +677,10 @@ class Matrix(dict):
         {('A', 'A'): 0.7}
         >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.,
                              ('C','D'): .5, ('D','C'): 1., ('C','B'): .5})
-        >>> T.remove_from(['A','B'])
+        >>> T.remove(['A','B'])
         {('C', 'D'): 0.5, ('D', 'C'): 1.0}
         """
-        return Matrix(dict([(key, value) for key, value in self.iteritems() if
+        return Matrix(dict([(key, value) for key, value in self.items() if
                        key[0] not in states and key[1] not in states]))
 #    @property
 #    def states(self):
@@ -693,7 +695,7 @@ class Matrix(dict):
 #            return self.__dict__["states"]
 #        except KeyError:
 #            self.__dict__["states"] = set()
-#            for link in  self.iterkeys():
+#            for link in  self.keys():
 #                self.states().add(link[0])
 #                self.states().add(link[1])
 #            return self.states()
@@ -703,13 +705,13 @@ class Matrix(dict):
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.states()
-        set(['A', 'B'])
+        {'A', 'B'}
         """
         try:
             return self._states
         except AttributeError:
             self._states = set()
-            for link in  self.iterkeys():
+            for link in  self.keys():
                 self._states.add(link[0])
                 self._states.add(link[1])
             return self._states
@@ -732,23 +734,25 @@ class Matrix(dict):
         if isinstance(v, Vector):
             e2p, p2e = self._el2pos_()
             x = v._toarray(e2p)
-            y = numpy.zeros(len(x))
-            self._ll_mat_(e2p).matvec(x, y)
+            M = self._dok_(e2p).tocsr()
+            y = M.dot(x)
             result = Vector()
             result._fromarray(y, e2p)
             return result
         elif isinstance(v, Matrix):
             e2p, p2e = self._el2pos_()
-            C = pysparse.spmatrix.matrixmultiply(self._ll_mat_(e2p), v._ll_mat_(e2p))
+            M = self._dok_(e2p).tocsr()
+            N = v._dok_(e2p).tocsr()
+            C = M.dot(N).todok()
             if 'Chain' in repr(self.__class__):
                 res = Chain()
             elif 'Matrix' in repr(self.__class__):
                 res = Matrix()
-            res._from_ll_mat_(C, p2e)
+            res._from_dok_(C, p2e)
             return res
         elif isinstance(v,int) or isinstance(v,float):
             return  Matrix(dict([(key, value * v) for key, value in
-                    self.iteritems()]))
+                    self.items()]))
         else:
             raise TypeError('unsupported operand type(s) for *:'+
                             ' \'Matrix\' and '+repr(type(v))[7:-1])
@@ -760,7 +764,7 @@ class Matrix(dict):
         """
         if isinstance(v,int) or isinstance(v,float):
             return  Matrix(dict([(key, value * v) for key, value in
-                    self.iteritems()]))
+                    self.items()]))
         else:
             raise TypeError('unsupported operand type(s) for *:'+
                             ' \'Matrix\' and '+repr(type(v))[7:-1])
@@ -830,47 +834,75 @@ class Matrix(dict):
         {('B', 'A'): 0.3, ('A', 'B'): 1.0, ('A', 'A'): 0.7}
         """
         return Matrix(dict([((key[1], key[0]), value) for key, value in
-               self.iteritems()]))
-    def _BiCGSTAB(self, b, x=None, error=1e-15, maxit=int(1e9)):
-        """
-        Biconjugate gradient stabilized method.
-        A * x = b
+               self.items()]))
 
-        References
-        ----------
-        Van der Vorst, H. A. (1992). "Bi-CGSTAB: A Fast and Smoothly Converging
-        Variant of Bi-CG for the Solution of Nonsymmetric Linear Systems". SIAM
-        Journal on Scientific and Statistical Computing 13: 631–644.
-        """
-        if not x:
-            x = numpy.ones(len(self.states()))
-        e2p, p2e = self._el2pos_()
-        A = self._ll_mat_(e2p).to_csr()
-        bb = b._toarray(e2p)
-        info, niter, relres = pysparse.itsolvers.bicgstab(A, bb, x, error, maxit)
-        if info > 0:
-            print('Sorry, not converged.')
-            return None
-        res = Vector()
-        res._fromarray(x, e2p)
-        return res
+    #deprecated 
+    #def _BiCGSTAB(self, b, x=None, error=1e-15, maxit=int(1e9)):
+    #    """
+    #    Biconjugate gradient stabilized method.
+    #    A * x = b
+    # 
+    #    References
+    #    ----------
+    #    Van der Vorst, H. A. (1992). "Bi-CGSTAB: A Fast and Smoothly Converging
+    #    Variant of Bi-CG for the Solution of Nonsymmetric Linear Systems". SIAM
+    #    Journal on Scientific and Statistical Computing 13: 631–644.
+    #    """
+    #    if not x:
+    #        x = numpy.ones(len(self.states()))
+    #    e2p, p2e = self._el2pos_()
+    #    A = self._dok_(e2p).to_csr()
+    #    bb = b._toarray(e2p)
+    #    info, niter, relres = pysparse.itsolvers.bicgstab(A, bb, x, error, maxit)
+    #    if info > 0:
+    #        print('Sorry, not converged.')
+    #        return None
+    #    res = Vector()
+    #    res._fromarray(x, e2p)
+    #    return res
+    #def _UMPFPACKSolveOld(self, b, x=None, method='UMFPACK_A'):
+    #    """
+    #    UMFPACK ( U nsymmetric M ulti F Rontal PACK age)
+    #    
+    #    Parameters
+    #    ----------
+    #    method (see pysparse doc.):
+    #        "UMFPACK_A"     :  \mathbf{A} x = b (default)
+    #        "UMFPACK_At"    :  \mathbf{A}^T x = b
+    #        "UMFPACK_Pt_L"  :  \mathbf{P}^T \mathbf{L} x = b
+    #        "UMFPACK_L"     :  \mathbf{L} x = b
+    #        "UMFPACK_Lt_P"  :  \mathbf{L}^T \mathbf{P} x = b
+    #        "UMFPACK_Lt"    :  \mathbf{L}^T x = b
+    #        "UMFPACK_U_Qt"  :  \mathbf{U} \mathbf{Q}^T x = b
+    #        "UMFPACK_U"     :  \mathbf{U} x = b
+    #        "UMFPACK_Q_Ut   :  \mathbf{Q} \mathbf{U}^T x = b
+    #        "UMFPACK_Ut"    :  \mathbf{U}^T x = b
+    #
+    #    References
+    #    ----------
+    #    A column pre-ordering strategy for the unsymmetric-pattern multifrontal
+    #    method, T. A. Davis, ACM Transactions on Mathematical Software, vol 30,
+    #    no. 2, June 2004, pp. 165-195.
+    #    """
+    #    if not x:
+    #        x = numpy.ones(len(self.states()))
+    #    e2p, p2e = self._el2pos_()
+    #    A = self._dok_(e2p)
+    #    bb = b._toarray(e2p)
+    #    LU = pysparse.umfpack.factorize(A)
+    #    LU.solve(bb, x, method)
+    #    res = Vector()
+    #    res._fromarray(x, e2p)
+    #    return res
     def _UMPFPACKSolve(self, b, x=None, method='UMFPACK_A'):
         """
         UMFPACK ( U nsymmetric M ulti F Rontal PACK age)
-        
+
         Parameters
         ----------
-        method (see pysparse doc.):
-            "UMFPACK_A"     :  \mathbf{A} x = b (default)
-            "UMFPACK_At"    :  \mathbf{A}^T x = b
-            "UMFPACK_Pt_L"  :  \mathbf{P}^T \mathbf{L} x = b
-            "UMFPACK_L"     :  \mathbf{L} x = b
-            "UMFPACK_Lt_P"  :  \mathbf{L}^T \mathbf{P} x = b
-            "UMFPACK_Lt"    :  \mathbf{L}^T x = b
-            "UMFPACK_U_Qt"  :  \mathbf{U} \mathbf{Q}^T x = b
-            "UMFPACK_U"     :  \mathbf{U} x = b
-            "UMFPACK_Q_Ut   :  \mathbf{Q} \mathbf{U}^T x = b
-            "UMFPACK_Ut"    :  \mathbf{U}^T x = b
+        method:
+          "UMFPACK_A"  : \mathbf{A} x = b (default) 
+          "UMFPACK_At" : \mathbf{A}^T x = b
 
         References
         ----------
@@ -878,13 +910,13 @@ class Matrix(dict):
         method, T. A. Davis, ACM Transactions on Mathematical Software, vol 30,
         no. 2, June 2004, pp. 165-195.
         """
-        if not x:
-            x = numpy.ones(len(self.states()))
         e2p, p2e = self._el2pos_()
-        A = self._ll_mat_(e2p)
+        if method == "UMFPACK_At":
+            A = self._dok_(e2p).tocsr().transpose()
+        else:
+            A = self._dok_(e2p).tocsr()
         bb = b._toarray(e2p)
-        LU = pysparse.umfpack.factorize(A)
-        LU.solve(bb, x, method)
+        x = ssl.spsolve(A, bb, use_umfpack=True)
         res = Vector()
         res._fromarray(x, e2p)
         return res
@@ -915,11 +947,10 @@ class Chain(Matrix):
         {'A': 0.7629999999999999, 'B': 0.23699999999999996}
         """
         e2p, p2e = self._el2pos_()
-        A = self._ll_mat_(e2p).to_csr()
+        A = self._dok_(e2p,'transpose').tocsr()
         x = p._toarray(e2p)
-        y = numpy.zeros(len(e2p))
-        for i in xrange(n):
-            A.matvec_transp(x, y)
+        for i in range(n):
+            y = A.dot(x)
             x = y.copy()
         res = Vector()
         res._fromarray(y, e2p)
@@ -945,9 +976,9 @@ class Chain(Matrix):
 #        Q = self.eye() - self
 #        Q = Q.transpose()
 #        e2p, p2e = self._el2pos_()
-#        A = Q._ll_mat_(e2p)
-#        D_E = pysparse.spmatrix.ll_mat(m, m, m) #diagonal + lower diagonal part
-#        F = pysparse.spmatrix.ll_mat(m, m, m)   #upper diagonal part
+#        A = Q._dok_(e2p)
+#        D_E = pysparse.spmatrix.dok(m, m, m) #diagonal + lower diagonal part
+#        F = pysparse.spmatrix.dok(m, m, m)   #upper diagonal part
 #        for k, v in A.items():
 #            if k[0] >= k[1]:
 #                D_E[k] = v
@@ -1003,7 +1034,7 @@ class Chain(Matrix):
 #            return self._steady
 #        except AttributeError:
 #            e2p, p2e = self._el2pos_()
-#            M = self._ll_mat_(e2p)
+#            M = self._dok_(e2p)
 #            m = len(self.states())
 #            r = range(m)
 #            M.put([M[i,i]-1. for i in r],r,r)
@@ -1049,23 +1080,14 @@ class Chain(Matrix):
             return self._steady
         except AttributeError:
             e2p, p2e = self._el2pos_()
-            M = self._ll_mat_(e2p, 'transpose')
-            M.scale(-1)
-            m = len(self.states())
-            r = range(m)
-            M.put([M[i,i]+1. for i in r],r,r)
-            b = numpy.zeros(m)
-            x = numpy.zeros(m)
-            b[-1] = 1.
-            try:
-                #LU = pysparse.direct.umfpack.factorize(M)
-                LU = pysparse.umfpack.factorize(M)
-            except SystemError:  #not elegant this singular matrix error..
-                # really dirty trick ??
-                M[0,0] = M[0,0] + _machineEpsilon()
-                #LU = pysparse.direct.umfpack.factorize(M)
-                LU = pysparse.umfpack.factorize(M)
-            LU.solve(b, x)
+            m = len(e2p)
+            P = self._dok_(e2p).tocsr()
+            Q = ss.eye(m,format='csr') - P
+            e = numpy.zeros(m)
+            e[-1] = 1.
+            Q = Q.transpose()
+            Q[0,0] = Q[0,0] + _machineEpsilon() #not elegant singular matrix error
+            x = ssl.spsolve(Q, e, use_umfpack=True)
             res = Vector()
             res._fromarray(x, e2p)
             res.normalize()
@@ -1103,7 +1125,7 @@ class Chain(Matrix):
         H = 0.
         for state in self.states():
             H += p[state] * sum([v * math.log(v) for v in
-                                self.succ(state).itervalues()])
+                                self.succ(state).values()])
         if norm:
             n = len(self.states())
             return -H / (n * math.log(n))
@@ -1137,12 +1159,12 @@ class Chain(Matrix):
         T = T.eye() - T
         return T._UMPFPACKSolve(T.ones())
         #return  T._BiCGSTAB(T.ones(), error=error, x=guess)
-    def adiacence(self):
+    def adjacency(self):
         """
-        Return the adiacence matrix.
+        Return the adjacency matrix.
 
         >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-        >>> T.adiacence()
+        >>> T.adjacency()
         {('B', 'A'): 1, ('A', 'B'): 1, ('A', 'A'): 1}
         """
         return Matrix(dict.fromkeys(self,1))
@@ -1298,7 +1320,7 @@ class Chain(Matrix):
         #variances
         #Ntau = K._UMPFPACKSolve(tau)
         #tau_square = Vector({})
-        #for k,v in tau.iteritems():
+        #for k,v in tau.items():
         #    tau_square[k] = v**2
         #var_tau = 2 * Ntau - tau - tau_square
         #--------
@@ -1312,7 +1334,7 @@ class Chain(Matrix):
         .. note::
            ``v.sum()`` is equal to ``p * tau`` (see :meth:`absorbing_time` method).
 
-        In not specified, the ``transient set`` (with its probability) is defined
+        In not specified, the ``transient set`` is defined
         by means of the ``Vector p``.
 
         .. seealso::
@@ -1395,15 +1417,15 @@ class Chain(Matrix):
 #        """
 #        tij = {}
 #        pi = self.steady()
-#        for key in self.iterkeys():
+#        for key in self.keys():
 #            if key not in tij:
 #                num = (pi[key[0]] * self[key] +
 #                       pi[key[1]] * self[(key[1],key[0])])
 #                den = (pi[key[0]] +
-#                       sum([pi[k] * v for k,v in self.pred(key[0]).iteritems()]))
+#                       sum([pi[k] * v for k,v in self.pred(key[0]).items()]))
 #                tij[key] = num/den
 #                den = (pi[key[1]] +
-#                       sum([pi[k] * v for k,v in self.pred(key[1]).iteritems()]))
+#                       sum([pi[k] * v for k,v in self.pred(key[1]).items()]))
 #                tij[(key[1],key[0])] = num/den
 #        return Chain(tij)
 #    def cFEP(self, node, p=None, temp=None):
@@ -1430,7 +1452,7 @@ class Chain(Matrix):
 #        if not p:
 #            p = self.steady()
 #        #p_ij = {}
-#        #for k, v in self.iteritems():
+#        #for k, v in self.items():
 #        #    p_ij[k] = p[k[0]] * v
 #        mfptnode = self.mfpt_to(node)
 #        result = [[node, 0.]]
@@ -1510,7 +1532,7 @@ class Chain(Matrix):
 #        """
 #        p = self.steady()
 #        result = 0
-#        for k1, k2 in self.iterkeys():
+#        for k1, k2 in self.keys():
 #            result += abs(p[k1] * T[k1,k2] - p[k2] * T[k2,k1])
 #        return result/2.
 #    def fundamental_matrix_col(self, state):
@@ -1676,13 +1698,13 @@ def maximum_likelihood_probabilities(trj, lag_time=1, separator='0'):
     tot = len(tr)
     for step in tr:
             q_ij[step] = q_ij.get(step, 0.) + 1
-    for key in q_ij.iterkeys():
+    for key in q_ij.keys():
         q_ij[key] = q_ij[key] / tot
     p_i = {}
-    for k, v in q_ij.iteritems():
+    for k, v in q_ij.items():
         p_i[k[0]] = p_i.get(k[0], 0) + v
     t_ij = {}
-    for k, v in q_ij.iteritems():
+    for k, v in q_ij.items():
         t_ij[k] = v / p_i[k[0]]
     T = Chain(t_ij)
     p = Vector(p_i)
