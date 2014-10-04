@@ -14,14 +14,10 @@ Installation
 -------------
 Pykov can be installed  via [`pip`<i class="icon-forward"></i>](http://pip.readthedocs.org/en/latest/#) 
 ```
-$ pip3 intall pykov #python3
+$ pip3 intall pykov3 #python3
 $ pip2 intall pykov #python2
 ```
-Note that the syntax of the `pip` command may depend on the platform.
-Dependencies are different among the python2 and python3 versions of pykov:
-
-* **pykov3** depends on **numpy** and **scipy**
-* **pykov** depends on **numpy** and [**pysparse 1.1.1**](http://sourceforge.net/projects/pysparse/files/) 
+The syntax of the `pip` command may depend on the platform, moreover note that Pykov depends on **numpy** and **scipy**.
 
 -----------------
 
@@ -241,9 +237,6 @@ A `pykov.Matrix()` instance can be added or substracted to another `pykov.Matrix
 >>> I = pykov.Matrix({('A','A'):1, ('B','B'):1})
 >>> T + I
 {('B', 'A'): 1.0, ('A', 'B'): 0.3, ('A', 'A'): 1.7, ('B', 'B'): 1.0}
-
->>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
->>> I = pykov.Matrix({('A','A'):1, ('B','B'):1})
 >>> T - I
 {('B', 'A'): 1.0, ('A', 'B'): 0.3, ('A', 'A'): -0.3, ('B', 'B'): -1}
 ```
@@ -279,9 +272,6 @@ Return the `set` of states.
 ```
 States without ingoing or outgoing transitions are removed from the set of states.
 ```
->>> T = pykov.Matrix({('A','B'): 3, ('A','A'): 7, ('B','A'): .1})
->>> T.states()
-{'A', 'B'}
 >>> T['A','C']=1
 >>> T.states()
 {'A', 'C', 'B'}
@@ -327,7 +317,7 @@ All the links where the states appear are deleted, so that the result will not b
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
 >>> T.remove(['B'])
 {('A', 'A'): 0.7}
->>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.,
+>>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.,
                      ('C','D'): .5, ('D','C'): 1., ('C','B'): .5})
 >>> T.remove(['A','B'])
 {('C', 'D'): 0.5, ('D', 'C'): 1.0}
@@ -410,7 +400,7 @@ Find the probability distribution after `n` steps, starting from an initial `pyk
 >>> p = pykov.Vector(A=1)
 >>> T.pow(p,3)
 {'A': 0.7629999999999999, 'B': 0.23699999999999996}
->>> p * T * T * T
+>>> p * T * T * T #not efficient
 {'A': 0.7629999999999999, 'B': 0.23699999999999996}
 ```
 
@@ -439,6 +429,7 @@ Return the *logarithm* of the **walk** probability (see `walk()` method). Imposs
 >>> T.walk_probability(['A','A','B','A','A'])
 -1.917322692203401
 >>> probability = math.exp(-1.917322692203401)
+>>> probability
 0.147
 
 >>> p = T.walk_probability(['A','B','B','B','A'])
@@ -553,7 +544,7 @@ Note that the fundamental matrix is not sparse.
 Return the Kemeny constant of the transition matrix.
 ```
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
->>> T.Kemeny_constant()
+>>> T.kemeny_constant()
 1.7692307692307712
 ```
 

@@ -167,7 +167,7 @@ class Vector(dict):
             return result
         elif isinstance(M, Vector):
             result = 0
-            for state, value in self.items():
+            for state, value in self.iteritems():
                 result += value * M[state]
             return result
         else:
@@ -181,7 +181,7 @@ class Vector(dict):
         """
         if isinstance(M,int) or isinstance(M,float):
             result = Vector()
-            for state, value in self.items():
+            for state, value in self.iteritems():
                 result[state] = value * M
             return result
         else:
@@ -196,7 +196,7 @@ class Vector(dict):
         """
         if isinstance(v, Vector):
             result = Vector()
-            for state in set(self.keys()) | set(v.keys()):
+            for state in set(self.iterkeys()) | set(v.keys()):
                 result[state] = self[state] + v[state]
             return result
         else:
@@ -213,7 +213,7 @@ class Vector(dict):
         """
         if isinstance(v, Vector):
             result = Vector()
-            for state in set(self.keys()) | set(v.keys()):
+            for state in set(self.iterkeys()) | set(v.keys()):
                 result[state] = self[state] - v[state]
             return result
         else:
@@ -228,7 +228,7 @@ class Vector(dict):
         array([ 0.7,  0.3])
         """
         p = numpy.zeros(len(el2pos))
-        for key, value in self.items():
+        for key, value in self.iteritems():
             p[el2pos[key]] = value
         return p
     def _fromarray(self, arr, el2pos):
@@ -253,7 +253,7 @@ class Vector(dict):
         >>> p.sort(reverse=True)
         [('C', 0.6), ('A', 0.3), ('B', 0.1)]
         """
-        res = list(self.items())
+        res = list(self.iteritems())
         res.sort(key=lambda lst: lst[1], reverse=reverse)
         return res
     def normalize(self):
@@ -266,7 +266,7 @@ class Vector(dict):
         {'A': 0.3, 'C': 0.6, 'B': 0.1}
         """
         s = self.sum()
-        for k in self.keys():
+        for k in self.iterkeys():
             self[k] = self[k]/s
     def choose(self):
         """
@@ -281,7 +281,7 @@ class Vector(dict):
            `Kevin Parks recipe <http://code.activestate.com/recipes/117241/>`_
         """
         n = random.uniform(0, 1)
-        for state, prob in self.items():
+        for state, prob in self.iteritems():
             if n < prob:
                 break
             n = n - prob
@@ -304,7 +304,7 @@ class Vector(dict):
         >>> p.entropy()
         0.6108643020548935
         """
-        return -sum([v*math.log(v) for v in self.values()])
+        return -sum([v*math.log(v) for v in self.itervalues()])
     def relative_entropy(self,p):
         """
         Return the Kullback-Leibler distance.
@@ -324,7 +324,7 @@ class Vector(dict):
         >>> q.relative_entropy(p)
         0.022582421084357485
         """
-        states = set(self.keys()) & set(p.keys())
+        states = set(self.iterkeys()) & set(p.keys())
         return sum([self[s]*math.log(self[s]/p[s]) for s in states])
     def copy(self):
         """
@@ -345,7 +345,7 @@ class Vector(dict):
         >>> p.sum()
         1.0
         """
-        return float(sum(self.values()))
+        return float(sum(self.itervalues()))
     def dist(self, v):
         """
         Return the distance between the two probability vectors.
@@ -361,7 +361,7 @@ class Vector(dict):
         """
         if isinstance(v, Vector):
             result = 0
-            for state in set(self.keys()) | set(v.keys()):
+            for state in set(self.iterkeys()) | set(v.keys()):
                 result += abs(v[state]-self[state])
             return result
 
@@ -514,12 +514,12 @@ class Matrix(dict):
         m = len(el2pos)
         S = ss.dok_matrix((m,m))
         if method == '':
-            for k, v in self.items():
+            for k, v in self.iteritems():
                 i = el2pos[k[0]]
                 j = el2pos[k[1]]
                 S[i,j] = float(v)
         elif method == 'transpose':
-            for k, v in self.items():
+            for k, v in self.iteritems():
                 i = el2pos[k[0]]
                 j = el2pos[k[1]]
                 S[j,i] = float(v)
@@ -541,7 +541,7 @@ class Matrix(dict):
         """
         m = len(el2pos)
         T = numpy.matrix(numpy.zeros((m, m)))
-        for k, v in self.items():
+        for k, v in self.iteritems():
             T[el2pos[k[0]], el2pos[k[1]]] = v
         return T
     
@@ -596,7 +596,7 @@ class Matrix(dict):
                 s[k] = summ
             else:
                 raise PykovError('Zero links from state '+k)
-        for k in self.keys():
+        for k in self.iterkeys():
             self[k] = self[k]/s[k[0]]
     def pred(self, key=None):
         """
@@ -616,7 +616,7 @@ class Matrix(dict):
                 return self._pred
         except AttributeError:
             self._pred = dict([(state, Vector()) for state in self.states()])
-            for link, probability in  self.items():
+            for link, probability in  self.iteritems():
                 self._pred[link[1]][link[0]] = probability
             if key is not None:
                 return self._pred[key]
@@ -640,7 +640,7 @@ class Matrix(dict):
                 return self._succ
         except AttributeError:
             self._succ = dict([(state, Vector()) for state in self.states()])
-            for link, probability in  self.items():
+            for link, probability in  self.iteritems():
                 self._succ[link[0]][link[1]] = probability
             if key is not None:
                 return self._succ[key]
@@ -660,7 +660,7 @@ class Matrix(dict):
 #        >>> Z
 #        {('A', 'A'): 0.7}
 #        """
-#        return Matrix(dict([(key, value) for key, value in self.items() if
+#        return Matrix(dict([(key, value) for key, value in self.iteritems() if
 #               state not in key]))
     def remove(self, states):
         """
@@ -680,7 +680,7 @@ class Matrix(dict):
         >>> T.remove(['A','B'])
         {('C', 'D'): 0.5, ('D', 'C'): 1.0}
         """
-        return Matrix(dict([(key, value) for key, value in self.items() if
+        return Matrix(dict([(key, value) for key, value in self.iteritems() if
                        key[0] not in states and key[1] not in states]))
 #    @property
 #    def states(self):
@@ -695,7 +695,7 @@ class Matrix(dict):
 #            return self.__dict__["states"]
 #        except KeyError:
 #            self.__dict__["states"] = set()
-#            for link in  self.keys():
+#            for link in  self.iterkeys():
 #                self.states().add(link[0])
 #                self.states().add(link[1])
 #            return self.states()
@@ -711,7 +711,7 @@ class Matrix(dict):
             return self._states
         except AttributeError:
             self._states = set()
-            for link in  self.keys():
+            for link in  self.iterkeys():
                 self._states.add(link[0])
                 self._states.add(link[1])
             return self._states
@@ -752,7 +752,7 @@ class Matrix(dict):
             return res
         elif isinstance(v,int) or isinstance(v,float):
             return  Matrix(dict([(key, value * v) for key, value in
-                    self.items()]))
+                    self.iteritems()]))
         else:
             raise TypeError('unsupported operand type(s) for *:'+
                             ' \'Matrix\' and '+repr(type(v))[7:-1])
@@ -764,7 +764,7 @@ class Matrix(dict):
         """
         if isinstance(v,int) or isinstance(v,float):
             return  Matrix(dict([(key, value * v) for key, value in
-                    self.items()]))
+                    self.iteritems()]))
         else:
             raise TypeError('unsupported operand type(s) for *:'+
                             ' \'Matrix\' and '+repr(type(v))[7:-1])
@@ -777,7 +777,7 @@ class Matrix(dict):
         """
         if isinstance(M, Matrix):
             result = Matrix()
-            for link in set(self.keys()) | set(M.keys()):
+            for link in set(self.iterkeys()) | set(M.keys()):
                 result[link] = self[link] + M[link]
             return result
         else:
@@ -792,7 +792,7 @@ class Matrix(dict):
         """
         if isinstance(M, Matrix):
             result = Matrix()
-            for link in set(self.keys()) | set(M.keys()):
+            for link in set(self.iterkeys()) | set(M.keys()):
                 result[link] = self[link] - M[link]
             return result
         else:
@@ -834,7 +834,7 @@ class Matrix(dict):
         {('B', 'A'): 0.3, ('A', 'B'): 1.0, ('A', 'A'): 0.7}
         """
         return Matrix(dict([((key[1], key[0]), value) for key, value in
-               self.items()]))
+               self.iteritems()]))
 
     #deprecated 
     #def _BiCGSTAB(self, b, x=None, error=1e-15, maxit=int(1e9)):
@@ -1417,7 +1417,7 @@ class Chain(Matrix):
 #        """
 #        tij = {}
 #        pi = self.steady()
-#        for key in self.keys():
+#        for key in self.iterkeys():
 #            if key not in tij:
 #                num = (pi[key[0]] * self[key] +
 #                       pi[key[1]] * self[(key[1],key[0])])
@@ -1452,7 +1452,7 @@ class Chain(Matrix):
 #        if not p:
 #            p = self.steady()
 #        #p_ij = {}
-#        #for k, v in self.items():
+#        #for k, v in self.iteritems():
 #        #    p_ij[k] = p[k[0]] * v
 #        mfptnode = self.mfpt_to(node)
 #        result = [[node, 0.]]
@@ -1532,7 +1532,7 @@ class Chain(Matrix):
 #        """
 #        p = self.steady()
 #        result = 0
-#        for k1, k2 in self.keys():
+#        for k1, k2 in self.iterkeys():
 #            result += abs(p[k1] * T[k1,k2] - p[k2] * T[k2,k1])
 #        return result/2.
 #    def fundamental_matrix_col(self, state):

@@ -9,4 +9,3 @@ setup(name='pykov',
       url='https://github.com/riccardoscalco/Pykov',
       py_modules=['pykov'],
       )
-
