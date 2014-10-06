@@ -8,4 +8,5 @@ setup(name='pykov',
       author_email='riccardo.scalco@gmail.com',
       url='https://github.com/riccardoscalco/Pykov',
       py_modules=['pykov'],
+      install_requires=['scipy', 'numpy'],
       )
