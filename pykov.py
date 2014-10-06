@@ -39,10 +39,6 @@ import scipy.sparse.linalg as ssl
 
 import six
 
-#import pysparse
-#import pysparse.direct
-#import networkx
-
 __date__ = 'Nov 2014'
 
 __version__ = 1.1
@@ -59,10 +55,6 @@ def _del_cache(fn):
     """
     def wrapper(*args, **kwargs):
         self = args[0]
-        #try:
-        #    del self.__dict__["states"]
-        #except KeyError:
-        #    pass
         try:
             del(self._states)
         except AttributeError:
@@ -110,7 +102,6 @@ class Vector(dict):
         >>> pykov.Vector(A=.3, B=.7)
         {'A':.3, 'B':.7}
         """
-        #dict.__init__(self)
         if data:
             self.update(data)
         if len(kwargs):
@@ -375,7 +366,6 @@ class Matrix(dict):
         """
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         """
-        #dict.__init__(self)
         if data:
             self.update(data)
     def __getitem__(self, *args):
@@ -569,13 +559,6 @@ class Matrix(dict):
             el2pos[element] = pos
             pos2el[pos] = element
         return el2pos, pos2el
-    #def _pos2el_(self):
-    #    """
-    #    """
-    #    pos2el = {}
-    #    for pos,element in enumerate(list(self.states())):
-    #        pos2el[pos] = element
-    #    return pos2el
     def stochastic(self):
         """
         Make a right stochastic matrix.
@@ -648,22 +631,6 @@ class Matrix(dict):
                 return self._succ[key]
             else:
                 return self._succ
-#    def remove(self, state):
-#        """
-#        Return a copy of the Chain, without the indicated state.
-#        
-#        All the links where the state appears are deleted, so that the result
-#        will not be in general a stochastic matrix.
-#
-#        Example
-#        -------
-#        >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-#        >>> Z = T.remove('B')
-#        >>> Z
-#        {('A', 'A'): 0.7}
-#        """
-#        return Matrix(dict([(key, value) for key, value in six.iteritems(self) if
-#               state not in key]))
     def remove(self, states):
         """
         Return a copy of the Chain, without the indicated states.
@@ -684,23 +651,6 @@ class Matrix(dict):
         """
         return Matrix(dict([(key, value) for key, value in six.iteritems(self) if
                        key[0] not in states and key[1] not in states]))
-#    @property
-#    def states(self):
-#        """
-#        Example
-#        -------
-#        >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-#        >>> T.states
-#        set(['A', 'B'])
-#        """
-#        try:
-#            return self.__dict__["states"]
-#        except KeyError:
-#            self.__dict__["states"] = set()
-#            for link in  six.iterkeys(self):
-#                self.states().add(link[0])
-#                self.states().add(link[1])
-#            return self.states()
     def states(self):
         """
         Return the set of states.
@@ -838,64 +788,6 @@ class Matrix(dict):
         return Matrix(dict([((key[1], key[0]), value) for key, value in
                six.iteritems(self)]))
 
-    #deprecated 
-    #def _BiCGSTAB(self, b, x=None, error=1e-15, maxit=int(1e9)):
-    #    """
-    #    Biconjugate gradient stabilized method.
-    #    A * x = b
-    # 
-    #    References
-    #    ----------
-    #    Van der Vorst, H. A. (1992). "Bi-CGSTAB: A Fast and Smoothly Converging
-    #    Variant of Bi-CG for the Solution of Nonsymmetric Linear Systems". SIAM
-    #    Journal on Scientific and Statistical Computing 13: 631–644.
-    #    """
-    #    if not x:
-    #        x = numpy.ones(len(self.states()))
-    #    e2p, p2e = self._el2pos_()
-    #    A = self._dok_(e2p).to_csr()
-    #    bb = b._toarray(e2p)
-    #    info, niter, relres = pysparse.itsolvers.bicgstab(A, bb, x, error, maxit)
-    #    if info > 0:
-    #        print('Sorry, not converged.')
-    #        return None
-    #    res = Vector()
-    #    res._fromarray(x, e2p)
-    #    return res
-    #def _UMPFPACKSolveOld(self, b, x=None, method='UMFPACK_A'):
-    #    """
-    #    UMFPACK ( U nsymmetric M ulti F Rontal PACK age)
-    #    
-    #    Parameters
-    #    ----------
-    #    method (see pysparse doc.):
-    #        "UMFPACK_A"     :  \mathbf{A} x = b (default)
-    #        "UMFPACK_At"    :  \mathbf{A}^T x = b
-    #        "UMFPACK_Pt_L"  :  \mathbf{P}^T \mathbf{L} x = b
-    #        "UMFPACK_L"     :  \mathbf{L} x = b
-    #        "UMFPACK_Lt_P"  :  \mathbf{L}^T \mathbf{P} x = b
-    #        "UMFPACK_Lt"    :  \mathbf{L}^T x = b
-    #        "UMFPACK_U_Qt"  :  \mathbf{U} \mathbf{Q}^T x = b
-    #        "UMFPACK_U"     :  \mathbf{U} x = b
-    #        "UMFPACK_Q_Ut   :  \mathbf{Q} \mathbf{U}^T x = b
-    #        "UMFPACK_Ut"    :  \mathbf{U}^T x = b
-    #
-    #    References
-    #    ----------
-    #    A column pre-ordering strategy for the unsymmetric-pattern multifrontal
-    #    method, T. A. Davis, ACM Transactions on Mathematical Software, vol 30,
-    #    no. 2, June 2004, pp. 165-195.
-    #    """
-    #    if not x:
-    #        x = numpy.ones(len(self.states()))
-    #    e2p, p2e = self._el2pos_()
-    #    A = self._dok_(e2p)
-    #    bb = b._toarray(e2p)
-    #    LU = pysparse.umfpack.factorize(A)
-    #    LU.solve(bb, x, method)
-    #    res = Vector()
-    #    res._fromarray(x, e2p)
-    #    return res
     def _UMPFPACKSolve(self, b, x=None, method='UMFPACK_A'):
         """
         UMFPACK ( U nsymmetric M ulti F Rontal PACK age)
@@ -957,99 +849,6 @@ class Chain(Matrix):
         res = Vector()
         res._fromarray(y, e2p)
         return res
-    #def vector(self, data=None, **kwargs):
-    #    """
-    #    Example
-    #    ------
-    #    See __init__ method of Vector class. 
-    #    >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-    #    >>> p = T.vector(A=1)
-    #    """
-    #    if not data:
-    #        data = {}
-    #    data.update(kwargs)
-    #    res = Vector(data)
-    #    res._chain = self
-    #    return res
-#    def _GaussSeidel(self, p=None, error=1e-12):
-#        """
-#        """
-#        m = len(self.states())
-#        Q = self.eye() - self
-#        Q = Q.transpose()
-#        e2p, p2e = self._el2pos_()
-#        A = Q._dok_(e2p)
-#        D_E = pysparse.spmatrix.dok(m, m, m) #diagonal + lower diagonal part
-#        F = pysparse.spmatrix.dok(m, m, m)   #upper diagonal part
-#        for k, v in A.items():
-#            if k[0] >= k[1]:
-#                D_E[k] = v
-#            else:
-#                F[k] = -v
-#        F = F.to_csr()
-#        LU = pysparse.umfpack.factorize(D_E)
-#        if not p:
-#            if hasattr(self,'_guess'):
-#                p = self._guess
-#            else:
-#                p = Vector({random.sample(self.states(),1)[0]:1.})
-#        x = p._toarray(e2p)
-#        err = 1.
-#        n = 0
-#        xold = x.copy()
-#        b = numpy.zeros(m)
-#        while err > error :
-#            F.matvec(x, b)
-#            LU.solve(b, x)
-#            n += 1
-#            if not n % 1000:
-#                err = numpy.linalg.norm( xold - x )
-#                print err
-#                xold = x.copy()
-#        res = Vector()
-#        res._fromarray(x, e2p)
-#        res.normalize()
-#        self._steady = res
-#        return res
-#    def steady_old(self):
-#        """
-#        With the assumption of ergodicity, return the steady state.
-#        
-#        Maths
-#        -----
-#        Inverse iteration method:
-#        Q = T - 11
-#        Q.trasp * x = e_n
-#
-#        References
-#        ----------
-#        W. Stewart: Introduction to the Numerical Solution of Markov Chains,
-#        Princeton University Press, Chichester, West Sussex, 1994.
-#
-#        Example
-#        -------
-#        >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-#        >>> T.steady()
-#        {'A': 0.7692307692307676, 'B': 0.23076923076923028}
-#        """
-#        try:
-#            return self._steady
-#        except AttributeError:
-#            e2p, p2e = self._el2pos_()
-#            M = self._dok_(e2p)
-#            m = len(self.states())
-#            r = range(m)
-#            M.put([M[i,i]-1. for i in r],r,r)
-#            b = numpy.zeros(m)
-#            x = numpy.zeros(m)
-#            b[-1] = 1.
-#            LU = pysparse.umfpack.factorize(M)
-#            LU.solve(b, x, "UMFPACK_At")
-#            res = Vector()
-#            res._fromarray(x, e2p)
-#            res.normalize()
-#            self._steady = res
-#            return res
     def steady(self):
         """
         With the assumption of ergodicity, return the steady state.
@@ -1133,7 +932,6 @@ class Chain(Matrix):
             return -H / (n * math.log(n))
         return -H
     def mfpt_to(self, state):
-    #def mfpt_to(self, state, error=1e-08, guess=None):
         """
         Return the Mean First Passage Times of every state to the indicated
         state.
@@ -1160,7 +958,6 @@ class Chain(Matrix):
         T = self.remove([state])
         T = T.eye() - T
         return T._UMPFPACKSolve(T.ones())
-        #return  T._BiCGSTAB(T.ones(), error=error, x=guess)
     def adjacency(self):
         """
         Return the adjacency matrix.
@@ -1221,21 +1018,6 @@ class Chain(Matrix):
                 return -float('Inf')
             res += math.log(self[step])
         return res
-#    def not_reversible(self):
-#        """
-#        (Heuristic) Return a float value between 1 and 0, where 0 means that the Chain is reversible.
-#        """
-#        res = 0
-#        S = set()
-#        pi = self.steady()
-#        for link in self:
-#            if link not in S:
-#                S.add(link)
-#                S.add((link[1],link[0]))
-#                res += abs(pi[link[0]] * self[link] -
-#                           pi[link[1]] * self[(link[1],link[0])]
-#                          )
-#        return res
     def mixing_time(self, cutoff=.25, jump=1, p=None):
         """
         Return the mixing time.
@@ -1274,14 +1056,11 @@ class Chain(Matrix):
         if not p:
             p = Vector({self.steady().sort()[0][0]:1})
         res.append(p.dist(self.steady()))
-        ##res.append(p.relative_entropy(self.steady()))
         while d > cutoff:
             n = n + jump
             p = self.pow(p,jump)
             d = p.dist(self.steady())
-            ##d = p.relative_entropy(self.steady())
             res.append(d)
-        #return n, [range(0,n+1,jump),res]
         return n
     def absorbing_time(self, transient_set):
         """
@@ -1318,15 +1097,6 @@ class Chain(Matrix):
         #means
         tau = K._UMPFPACKSolve(K.ones())
         return tau
-        #-----
-        #variances
-        #Ntau = K._UMPFPACKSolve(tau)
-        #tau_square = Vector({})
-        #for k,v in tau.items():
-        #    tau_square[k] = v**2
-        #var_tau = 2 * Ntau - tau - tau_square
-        #--------
-        #return tau, var_tau
     def absorbing_tour(self, p, transient_set=None):
         """
         Return a ``Vector v``, ``v[i]`` is the mean of the total number of times
@@ -1403,169 +1173,6 @@ class Chain(Matrix):
         """
         Z = self.fundamental_matrix()
         return Z.trace()
-        #K = 0.
-        #for state in self.states():
-        #    K = K + Z.get((state, state), 0)
-        #return K
-#    def force_detailed_balance(self):
-#        """
-#        (Heuristic) Return a new Chain, which satisfies detailed balance.
-#
-#        Maths
-#        -----
-#        q_ij_db = q_ji_db = (pi_i * T_ij + pi_j * T_ji) / 2
-#        pi_i_db = sum_j q_ij_db
-#        Tij_db = q_ij_db / pi_i_db
-#        """
-#        tij = {}
-#        pi = self.steady()
-#        for key in six.iterkeys(self):
-#            if key not in tij:
-#                num = (pi[key[0]] * self[key] +
-#                       pi[key[1]] * self[(key[1],key[0])])
-#                den = (pi[key[0]] +
-#                       sum([pi[k] * v for k,v in self.pred(key[0]).items()]))
-#                tij[key] = num/den
-#                den = (pi[key[1]] +
-#                       sum([pi[k] * v for k,v in self.pred(key[1]).items()]))
-#                tij[(key[1],key[0])] = num/den
-#        return Chain(tij)
-#    def cFEP(self, node, p=None, temp=None):
-#        """
-#        (Heuristic) Return the cut based free energy profile.
-#    
-#        Mfpt ordering.
-#        Return a list of lists:
-#        [[node, mfpt, p_A, p_AB, -KTlog(P_AB), -KTlog(P_AB/P_A)],
-#        [...],
-#        ...]
-#    
-#        -- Parameters --
-#        chain : a Chain object
-#        p_i : the steady state of the chain
-#        node : the reference node
-#        temp : the temperature (if None, KT is set to 1)
-#        """
-#        if not temp:
-#            KT = 1
-#        else:
-#            KB = 1.987E-3 #Boltzman constant in kCal/(mol K)
-#            KT=temp*KB
-#        if not p:
-#            p = self.steady()
-#        #p_ij = {}
-#        #for k, v in six.iteritems(self):
-#        #    p_ij[k] = p[k[0]] * v
-#        mfptnode = self.mfpt_to(node)
-#        result = [[node, 0.]]
-#        result.extend([list(i) for i in mfptnode.sort()])
-#        A = set()
-#        C = set()
-#        p_A = 0.
-#        for data in result[:-1]:
-#            p_A = p_A +p[data[0]]
-#            A = A | set([data[0]])
-#            C = C | set(self.succ(data[0]).keys())
-#            C = C - A
-#            p_AB = 0.
-#            for i in C:
-#                for j in set(self.pred(i).keys()):
-#                    if j in A:
-#                        #p_AB = p_AB + p_ij[(j,i)]
-#                        p_AB = p_AB + p[j] * self[j,i]
-#            data.append(p_A)
-#            data.append(p_AB)
-#            data.append(-KT * math.log(p_AB))
-#            data.append(-KT * math.log(p_AB / p_A))
-#        return result
-#    def graph(self, attribute_data=None):
-#        """
-#        Return the associated directed graph as a networkx.DiGraph object.
-#        
-#        Paramenters
-#        -----------
-#        attribute : a dict keyed by links an valued by an python objects.
-#
-#        Example
-#        -------
-#        >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
-#        >>> G = T.graph()
-#        >>> G.edges()
-#        [('A', 'A'), ('A', 'B'), ('B', 'A')]
-#        """
-#        G = networkx.DiGraph()
-#        if not attribute_data:
-#            for k1, k2 in self:
-#                G.add_edge(k1, k2)
-#        else:
-#            for k1, k2 in self:
-#                G.add_edge(k1, k2, attribute = attribute_data[(k1,k2)])
-#        return G
-#    def irreducible_components(self):
-#        """
-#        Return the irredicible (i.e. strongly connected) components, ordered in size.
-#
-#        Example
-#        -------
-#        >>> d = {('R','R'):1./2, ('R','N'):1./4, ('R','S'):1./4,
-#                  ('N','N'):1./2, ('N','S'):1./2, ('S','N'):1./2, ('S','S'):1./2}
-#        >>> T = pykov.Chain(d)
-#        >>> T.irredicible_components()
-#        [['N', 'S'], ['R']]
-#
-#        References
-#        ----------
-#        The function calls networkx.strongly_connected_components().
-#        """
-#        G = self.graph()
-#        return networkx.strongly_connected_components(G)
-#    def extract_irreducible_component(self,component):
-#        """
-#        Return the Chain associated to the indicated irreducible component.
-#
-#        An operation of normalization is imposed (see stochastic method).
-#        """
-#        res = self.remove(self.states() - set(component))
-#        res = Chain(res)
-#        res.stochastic()
-#        return res
-#    def test_detailed_balance(self):
-#        """
-#        """
-#        p = self.steady()
-#        result = 0
-#        for k1, k2 in six.iterkeys(self):
-#            result += abs(p[k1] * T[k1,k2] - p[k2] * T[k2,k1])
-#        return result/2.
-#    def fundamental_matrix_col(self, state):
-#        """
-#        """
-#        A = Matrix()
-#        for i in self.states():
-#            for j in self.states():
-#                A[i,j] = self.steady()[j]
-#        L = self.eye() - self + A
-#        x = L._BiCGSTAB(Vector({state:1.}), error=1e-08, x=None)
-#        return x
-#    def fundamental_matrix_row(self, state):
-#        """
-#        """
-#        A = Matrix()
-#        for i in self.states():
-#            for j in self.states():
-#                A[i,j] = self.steady()[j]
-#        L = self.eye() - self + A
-#        L = L.transpose()
-#        x = L._BiCGSTAB(Vector({state:1.}), error=1e-08, x=None)
-#        return x
-#    def mfpt_to1(self, state):
-#        """
-#        """
-#        pi = self.steady()
-#        Z_state = self.fundamental_matrix_col(state)
-#        result = Vector({i:Z_state[state]-Z_state[i] for i in Z_state})
-#        return Vector({state:1./pi[state]}) + 1./pi[state] * result
-#
 
 def readmat(filename):
     """
@@ -1712,26 +1319,6 @@ def maximum_likelihood_probabilities(trj, lag_time=1, separator='0'):
     p = Vector(p_i)
     T._guess = Vector(p_i)
     return p, T
-#def non_Markovian_flux(trj, lag_time=1, separator='0'):
-#    """
-#    (Heuristic) Return the non-Markovian flux.
-#
-#    It is a number between 0 and 1.
-#    0 implies markovianity
-#    1 implies not markovianity
-#
-#    Example
-#    -------
-#    >>> t = [1,2,3,2,3,2,1,2,2,3,3,2]
-#    >>> pykov.non_Markovian_flux(t)
-#    0.15000000000000013
-#    """
-#    p, C = maximum_likelihood_probabilities(trj,
-#                   lag_time=lag_time, separator=separator)
-#    tr = set(transitions(trj, nsteps=2, lag_time=lag_time,
-#                  separator=separator))
-#    r = [p[i[0]] * C[i[0], i[1]]  * C[i[1], i[2]] for i in tr]
-#    return 1 - sum(r)
 def _remove_dead_branch(transitions_list):
     """
     Remove dead branchs inserting a selfloop in every node that has not
@@ -1767,7 +1354,3 @@ def _machineEpsilon(func=float):
         machine_epsilon_last = machine_epsilon
         machine_epsilon = func(machine_epsilon) / func(2)
     return machine_epsilon_last
-#def minfloat(guess=1.):
-#    while(guess * 0.5 != 0):
-#        guess = guess * 0.5
-#    return guess
