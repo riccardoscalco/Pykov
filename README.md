@@ -14,8 +14,8 @@ Installation
 -------------
 Pykov can be installed  via [`pip`<i class="icon-forward"></i>](http://pip.readthedocs.org/en/latest/#) 
 ```sh
-$ pip3 intall pykov3 #python3
-$ pip2 intall pykov #python2
+$ pip3 install pykov3 #python3
+$ pip2 install pykov #python2
 ```
 The syntax of the `pip` command may depend on the platform, moreover note that Pykov depends on **numpy** and **scipy**.
 
