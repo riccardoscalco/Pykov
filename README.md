@@ -12,12 +12,11 @@ Pykov is licensed under the terms of the **GNU General Public License** as publi
 
 Installation
 -------------
-Pykov can be installed  via [`pip`<i class="icon-forward"></i>](http://pip.readthedocs.org/en/latest/#) 
+Pykov can be installed via [`pip`<i class="icon-forward"></i>](http://pip.readthedocs.org/en/latest/#) 
 ```sh
-$ pip3 install pykov3 #python3
-$ pip2 install pykov #python2
+$ pip install pykov #both Python2 and Python3
 ```
-The syntax of the `pip` command may depend on the platform, moreover note that Pykov depends on **numpy** and **scipy**.
+Note that Pykov depends on **numpy** and **scipy**.
 
 -----------------
 
