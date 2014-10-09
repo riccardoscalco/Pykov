@@ -29,15 +29,13 @@
 
 """
 
-
 import random
 import math
-
+import six
 import numpy
+
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
-
-import six
 
 __date__ = 'Nov 2014'
 
