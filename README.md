@@ -449,7 +449,7 @@ $Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$, and the Markov
 chains is assumed to be ergodic.
 A Markov chain is ergodic if the transition matrix is irreducible
 and acyclic, you can easily test such properties by means of
-[NetworkX](http://networkx.github.io/), let see how:
+[NetworkX](http://networkx.github.io/), let's see how:
 ```python
 >>> import networkx as nx
 
@@ -466,6 +466,13 @@ True
 False
 >>> nx.is_aperiodic(G)
 True
+
+>>> T = pykov.Chain({('A','B'): 1, ('B','C'): 1., ('C','A'): 1.})
+>>> G = nx.DiGraph(list(T.keys()))
+>>> nx.is_strongly_connected(G)
+True
+>>> nx.is_aperiodic(G)
+False
 ```
 
 Often, Markov chains created from raw data are not irreducibles.
