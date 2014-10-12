@@ -443,9 +443,41 @@ Return the steady state, i.e. the equilibrium distribution of the chain.
 >>> T.steady()
 {'A': 0.7692307692307676, 'B': 0.23076923076923028}
 ```
-The steady state $x$ is calculated with the *inverse iteration method* $Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$.
+The steady state $x$ is calculated with the *inverse iteration method* 
+$Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$, and the Markov
+chains is assumed to be ergodic.
+A Markov chain is ergodic if the transition matrix is irreducible
+and acyclic, you can easily test such properties by means of
+[NetworkX](http://networkx.github.io/), let see how:
+```python
+>>> import networkx as nx
 
-For further details, have a look at *W. Stewart, Introduction to the Numerical Solution of Markov Chains, Princeton University Press, Chichester, West Sussex, 1994*.
+>>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
+>>> G = nx.DiGraph(list(T.keys()))
+>>> nx.is_strongly_connected(G) # is irreducible
+True
+>>> nx.is_aperiodic(G)
+True
+
+>>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','B'): 1.})
+>>> G = nx.DiGraph(list(T.keys()))
+>>> nx.is_strongly_connected(G) # is irreducible
+False
+>>> nx.is_aperiodic(G)
+True
+```
+
+Often, Markov chains created from raw data are not irreducibles.
+In such cases, the Markov chain may be defined by means of the
+largest strongly connected component of the associated graph.
+Strongly connected components can be found with NetworkX:
+```python
+>>> nx.strongly_connected_components(G)
+```
+
+For further details on the inverse iteration method,
+have a look at *W. Stewart, Introduction to the Numerical Solution of
+Markov Chains, Princeton University Press, Chichester, West Sussex, 1994*.
 
 #####**mixing_time(cutoff=0.25, jump=1, p=None)**
 Return the [mixing time](http://en.wikipedia.org/wiki/Markov_chain_mixing_time), defined as the number of steps needed to have $|pT^n - \pi|<0.25$, where $\pi$ is the steady state $\pi = \pi T$.

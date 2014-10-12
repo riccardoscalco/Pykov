@@ -108,9 +108,11 @@ class Vector(dict):
         {'A':.3, 'B':.7}
         """
         if data:
-            self.update(data)
+            self.update([item for item in six.iteritems(data)
+                if abs(item[1]) > numpy.finfo(numpy.float).eps])
         if len(kwargs):
-            self.update(kwargs)
+            self.update([item for item in six.iteritems(kwargs)
+                if abs(item[1]) > numpy.finfo(numpy.float).eps])
 
     def __getitem__(self, key):
         """
@@ -388,7 +390,8 @@ class Matrix(dict):
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         """
         if data:
-            self.update(data)
+            self.update([item for item in six.iteritems(data)
+                if abs(item[1]) > numpy.finfo(numpy.float).eps])
 
     def __getitem__(self, *args):
         """
@@ -941,9 +944,9 @@ class Chain(Matrix):
             # not elegant singular matrix error
             Q[0, 0] = Q[0, 0] + _machineEpsilon()
             x = ssl.spsolve(Q, e, use_umfpack=True)
+            x = x/sum(x)
             res = Vector()
             res._fromarray(x, e2p)
-            res.normalize()
             self._steady = res
             return res
 
