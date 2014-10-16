@@ -378,7 +378,10 @@ Return the matrix [trace](http://en.wikipedia.org/wiki/Trace_%28linear_algebra%2
 
 ###Chain class
 
-The `pykov.Chain` class inherits from `pykov.Matrix` class. The dict `key` is a tuple of states, the dict `value` is the transition probability to go from the first state to the second state.
+The `pykov.Chain` class inherits from `pykov.Matrix` class.
+The dict `key` is a tuple of states, the dict `value` is the transition
+probability to go from the first state to the second state, in other words
+pykov describes the transitions of a Markov chain with a *right* stochastic matrix.
 
 #### Chain methods
 
@@ -444,11 +447,13 @@ Return the steady state, i.e. the equilibrium distribution of the chain.
 >>> T.steady()
 {'A': 0.7692307692307676, 'B': 0.23076923076923028}
 ```
-The steady state $x$ is calculated with the *inverse iteration method* 
-$Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$, and the Markov
-chains is assumed to be ergodic.
-A Markov chain is ergodic if the transition matrix is irreducible
-and acyclic, you can easily test such properties by means of
+Since Pykov describes the chain with a right stochatic matrix,
+the steady state $x$ satisfies at the condition $p=pT$
+and it is calculated with the *inverse iteration method* 
+$Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$.
+Moreover, the Markov chain is assumed to be ergodic, i.e. the transition matrix
+must be irreducible and acyclic.
+You can easily test such properties by means of
 [NetworkX](http://networkx.github.io/), let's see how:
 ```python
 >>> import networkx as nx
