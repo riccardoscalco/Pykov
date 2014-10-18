@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Pykov by riccardoscalco</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Pykov</h1>
+        <h2>Pykov is a tiny Python module on finite regular Markov chains.</h2>
+        <a href="https://github.com/riccardoscalco/Pykov" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="welcome-to-pykov-docs" class="anchor" href="#welcome-to-pykov-docs"><span class="octicon octicon-link"></span></a>Welcome to Pykov docs</h1>
+
+<p>Pykov is a tiny Python module on <em>finite regular Markov chains</em>.</p>
+
+<p>You can define a Markov chain from scratch or read it from a text file according specific format. Pykov is versatile, being it able to manipulate the chain, inserting and removing nodes, and to calculate various kind of quantities, like the steady state distribution, mean first passage times, random walks, absorbing times, and so on.</p>
+
+<p>Pykov is licensed under the terms of the <strong>GNU General Public License</strong> as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+
+<hr>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Pykov can be installed/upgraded via <a href="http://pip.readthedocs.org/en/latest/#"><code>pip</code><i></i></a> </p>
+
+<div class="highlight highlight-sh"><pre><span class="nv">$ </span>pip install git+git://github.com/riccardoscalco/Pykov@master <span class="c">#both Python2 and Python3</span>
+<span class="nv">$ </span>pip install --upgrade git+git://github.com/riccardoscalco/Pykov@master
+</pre></div>
+
+<p>Note that Pykov depends on <strong>numpy</strong> and <strong>scipy</strong>.</p>
+
+<hr>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<p>Open your favourite Python shell and import pykov:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pykov</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pykov</span><span class="o">.</span><span class="n">__version__</span>
+</pre></div>
+
+<h3>
+<a name="vector-class" class="anchor" href="#vector-class"><span class="octicon octicon-link"></span></a>Vector class</h3>
+
+<p>The <strong>Vector class</strong> inherits from python <code>dict</code>, which means it has the same behaviors and features of python dictionaries, with few exceptions. The states and the corresponding probabilities are the keys and the values of the dictionary, respectively.</p>
+
+<p>Definition of a <code>pykov.Vector()</code>:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
+</pre></div>
+
+<p>You can <em>get</em> and <em>set</em> states in many ways:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="p">[</span><span class="s">'A'</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">({</span><span class="s">'A'</span><span class="p">:</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span><span class="o">.</span><span class="mi">7</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span><span class="mf">0.3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span><span class="mf">0.7</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">6</span><span class="p">,</span> <span class="n">C</span><span class="o">=.</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span><span class="mf">0.3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span><span class="mf">0.6</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span><span class="mf">0.1</span><span class="p">}</span>
+</pre></div>
+
+<p>States not belonging to the vector have zero probability, moreover states with zero probability are not shown:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">C</span><span class="o">=.</span><span class="mi">4</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[</span><span class="s">'C'</span><span class="p">]</span>
+<span class="mf">0.4</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[</span><span class="s">'Z'</span><span class="p">]</span>
+<span class="mf">0.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'Z'</span> <span class="ow">in</span> <span class="n">q</span>
+<span class="bp">False</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[</span><span class="s">'Z'</span><span class="p">]</span><span class="o">=.</span><span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
+<span class="p">{</span><span class="s">'C'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s">'Z'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'Z'</span> <span class="ow">in</span> <span class="n">q</span>
+<span class="bp">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[</span><span class="s">'Z'</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
+<span class="p">{</span><span class="s">'C'</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="s">'Z'</span> <span class="ow">in</span> <span class="n">q</span>
+<span class="bp">False</span>
+</pre></div>
+
+<h4>
+<a name="vector-operations" class="anchor" href="#vector-operations"><span class="octicon octicon-link"></span></a>Vector operations</h4>
+
+<h5>
+<a name="sum" class="anchor" href="#sum"><span class="octicon octicon-link"></span></a><strong>Sum</strong>
+</h5>
+
+<p>A <code>pykov.Vector()</code> instance can be added or substracted to another <code>pykov.Vector()</code> instance:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">C</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">+</span> <span class="n">q</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">-</span> <span class="n">q</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">-</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="product" class="anchor" href="#product"><span class="octicon octicon-link"></span></a><strong>Product</strong>
+</h5>
+
+<p>A <code>pykov.Vector()</code> instance can be multiplied by a scalar. The <em>dot product</em> with another <code>pykov.Vector()</code> or <code>pykov.Matrix()</code> instance is also supported.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">2.1</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">2.1</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">C</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+<span class="mf">0.35</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">*</span> <span class="n">T</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.91</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.09</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">*</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="vector-methods" class="anchor" href="#vector-methods"><span class="octicon octicon-link"></span></a>Vector methods</h4>
+
+<h5>
+<a name="sum-1" class="anchor" href="#sum-1"><span class="octicon octicon-link"></span></a><strong>sum()</strong>
+</h5>
+
+<p>Sum the probability values.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="mf">1.0</span>
+</pre></div>
+
+<h5>
+<a name="sortreversefalse" class="anchor" href="#sortreversefalse"><span class="octicon octicon-link"></span></a><strong>sort(reverse=False)</strong>
+</h5>
+
+<p>Return a list of tuples <code>(state, probability)</code> sorted according the probability values.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">({</span><span class="s">'A'</span><span class="p">:</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span><span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span><span class="o">.</span><span class="mi">6</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="p">[(</span><span class="s">'B'</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="p">(</span><span class="s">'C'</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="p">[(</span><span class="s">'C'</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">),</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)]</span>
+</pre></div>
+
+<h5>
+<a name="choose" class="anchor" href="#choose"><span class="octicon octicon-link"></span></a><strong>choose()</strong>
+</h5>
+
+<p>Choose a state at random, according to its probability.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">choose</span><span class="p">()</span>
+<span class="s">'B'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">choose</span><span class="p">()</span>
+<span class="s">'B'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">choose</span><span class="p">()</span>
+<span class="s">'A'</span>
+</pre></div>
+
+<h5>
+<a name="normalize" class="anchor" href="#normalize"><span class="octicon octicon-link"></span></a><strong>normalize()</strong>
+</h5>
+
+<p>Normalize the <code>pykov.Vector</code>, after normalization the probabilities sum to 1.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">({</span><span class="s">'A'</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span><span class="mi">6</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="mf">10.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s">'C'</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="mf">1.0</span>
+</pre></div>
+
+<h5>
+<a name="copy" class="anchor" href="#copy"><span class="octicon octicon-link"></span></a><strong>copy()</strong>
+</h5>
+
+<p>Return a shallow copy.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="p">[</span><span class="s">'C'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="entropy" class="anchor" href="#entropy"><span class="octicon octicon-link"></span></a><strong>entropy()</strong>
+</h5>
+
+<p>Return the Shannon entropy, defined as $H(p) = \sum_i p_i \ln p_i$.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span>
+<span class="mf">0.6108643020548935</span>
+</pre></div>
+
+<p>For further details, have a look at <em>Khinchin A. I., Mathematical Foundations of Information Theory Dover, 1957</em>.</p>
+
+<h5>
+<a name="distq" class="anchor" href="#distq"><span class="octicon octicon-link"></span></a><strong>dist(q)</strong>
+</h5>
+
+<p>Return the distance to another <code>pykov.Vector</code>, defined as $d(p,q) = \sum_i | p_i - q_i |$. </p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">C</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="mf">1.0</span>
+</pre></div>
+
+<h5>
+<a name="relative_entropyq" class="anchor" href="#relative_entropyq"><span class="octicon octicon-link"></span></a><strong>relative_entropy(q)</strong>
+</h5>
+
+<p>Return the <em>Kullback-Leibler</em> distance, defined as $d(p,q) = \sum_i p_i \ln (p_i/q_i)$.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">4</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">6</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">.</span><span class="n">relative_entropy</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="c">#d(p,q)</span>
+<span class="mf">0.02160085414354654</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">.</span><span class="n">relative_entropy</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="c">#d(q,p)</span>
+<span class="mf">0.022582421084357485</span>
+</pre></div>
+
+<p>Note that the Kullback-Leibler distance is not symmetric.</p>
+
+<hr>
+
+<h3>
+<a name="matrix-class" class="anchor" href="#matrix-class"><span class="octicon octicon-link"></span></a>Matrix class</h3>
+
+<p>The <code>pykov.Matrix()</code> class inherits from python dictionaries. Dict <code>keys</code> are <code>tuple</code> of states, dict <code>values</code> are the matrix entries. Indexes do not need to be <code>int</code>, they can be <code>string</code>, as the states of a <code>pykov.Vector()</code>.</p>
+
+<p>Definition of  <code>pykov.Matrix()</code>:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
+</pre></div>
+
+<p>You can <em>get</em> and <em>set</em> items in many ways:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">)]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">]</span> <span class="o">=</span> <span class="o">.</span><span class="mi">7</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">)]</span>
+<span class="mf">0.3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">]</span>
+<span class="mf">0.3</span>
+</pre></div>
+
+<p>Items not belonging to the matrix have value equal to zero, moreover items with value equal to zero are not shown:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">]</span>
+<span class="mf">0.0</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="matrix-operations" class="anchor" href="#matrix-operations"><span class="octicon octicon-link"></span></a>Matrix operations</h4>
+
+<h5>
+<a name="sum-2" class="anchor" href="#sum-2"><span class="octicon octicon-link"></span></a><strong>Sum</strong>
+</h5>
+
+<p>A <code>pykov.Matrix()</code> instance can be added or substracted to another <code>pykov.Matrix()</code> instance.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">I</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span><span class="mi">1</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">+</span> <span class="n">I</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">-</span> <span class="n">I</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="o">-</span><span class="mi">1</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="product-1" class="anchor" href="#product-1"><span class="octicon octicon-link"></span></a><strong>Product</strong>
+</h5>
+
+<p>A <code>pykov.Matrix()</code> instance can be multiplied by a scalar, the dot product with a <code>pykov.Vector()</code> or another <code>pykov.Matrix()</code> instance is also supported.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">3.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.9</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">2.1</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=.</span><span class="mi">3</span><span class="p">,</span> <span class="n">B</span><span class="o">=.</span><span class="mi">7</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">*</span> <span class="n">p</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">W</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'M'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">,</span>
+                      <span class="p">(</span><span class="s">'M'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'O'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span>
+                      <span class="p">(</span><span class="s">'O'</span><span class="p">,</span> <span class="s">'O'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'O'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">W</span> <span class="o">*</span> <span class="n">W</span>
+<span class="p">{(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">):</span> <span class="mf">0.15</span><span class="p">,</span> <span class="p">(</span><span class="s">'M'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.21</span><span class="p">,</span> <span class="p">(</span><span class="s">'M'</span><span class="p">,</span> <span class="s">'O'</span><span class="p">):</span> <span class="mf">0.35</span><span class="p">,</span>
+ <span class="p">(</span><span class="s">'M'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">):</span> <span class="mf">0.44</span><span class="p">,</span> <span class="p">(</span><span class="s">'O'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="s">'O'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span>
+ <span class="p">(</span><span class="s">'O'</span><span class="p">,</span> <span class="s">'O'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'O'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.6</span><span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="matrix-methods" class="anchor" href="#matrix-methods"><span class="octicon octicon-link"></span></a>Matrix methods</h4>
+
+<h5>
+<a name="states" class="anchor" href="#states"><span class="octicon octicon-link"></span></a><strong>states()</strong>
+</h5>
+
+<p>Return the <code>set</code> of states.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">states</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">}</span>
+</pre></div>
+
+<p>States without ingoing or outgoing transitions are removed from the set of states.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'C'</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">states</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'C'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[</span><span class="s">'A'</span><span class="p">,</span><span class="s">'C'</span><span class="p">]</span><span class="o">=</span><span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">states</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="predkeynone" class="anchor" href="#predkeynone"><span class="octicon octicon-link"></span></a><strong>pred(key=None)</strong>
+</h5>
+
+<p>Return the precedessors of a state (if not indicated, of all states). In matrix notation, return the column of the indicated state.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">pred</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span> <span class="s">'B'</span><span class="p">:</span> <span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">pred</span><span class="p">(</span><span class="s">'A'</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="succkeynone" class="anchor" href="#succkeynone"><span class="octicon octicon-link"></span></a><strong>succ(key=None)</strong>
+</h5>
+
+<p>Return the successors of a state (if not indicated, of all states). In matrix notation, return the row of the indicated state.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">succ</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">},</span> <span class="s">'B'</span><span class="p">:</span> <span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">succ</span><span class="p">(</span><span class="s">'A'</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="copy-1" class="anchor" href="#copy-1"><span class="octicon octicon-link"></span></a><strong>copy()</strong>
+</h5>
+
+<p>Return a shallow copy.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">W</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">W</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="removestates" class="anchor" href="#removestates"><span class="octicon octicon-link"></span></a><strong>remove(states)</strong>
+</h5>
+
+<p>Return a shallow copy of the matrix without the indicated states.
+All the links where the states appear are deleted, so that the result will not be in general a stochastic matrix.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">remove</span><span class="p">([</span><span class="s">'B'</span><span class="p">])</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">,</span>
+                     <span class="p">(</span><span class="s">'C'</span><span class="p">,</span><span class="s">'D'</span><span class="p">):</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="s">'D'</span><span class="p">,</span><span class="s">'C'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">,</span> <span class="p">(</span><span class="s">'C'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">5</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">remove</span><span class="p">([</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">])</span>
+<span class="p">{(</span><span class="s">'C'</span><span class="p">,</span> <span class="s">'D'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'D'</span><span class="p">,</span> <span class="s">'C'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="stochastic" class="anchor" href="#stochastic"><span class="octicon octicon-link"></span></a><strong>stochastic()</strong>
+</h5>
+
+<p>Change the <code>pykov.Matrix()</code> instance in a right <a href="http://en.wikipedia.org/wiki/Stochastic_matrix">stochastic matrix</a>.
+Set the sum of every row equal to one, raise <code>PykovError</code> if not possible.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">2</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">stochastic</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="p">[(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'C'</span><span class="p">)]</span><span class="o">=</span><span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">stochastic</span><span class="p">()</span>
+<span class="n">pykov</span><span class="o">.</span><span class="n">PykovError</span><span class="p">:</span> <span class="s">'Zero links from node C'</span>
+</pre></div>
+
+<h5>
+<a name="transpose" class="anchor" href="#transpose"><span class="octicon octicon-link"></span></a><strong>transpose()</strong>
+</h5>
+
+<p>Return the transpose of the <code>pykov.Matrix()</code> instance.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="eye" class="anchor" href="#eye"><span class="octicon octicon-link"></span></a><strong>eye()</strong>
+</h5>
+
+<p>Return the <a href="http://en.wikipedia.org/wiki/Identity_matrix">Identity matrix</a>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">eye</span><span class="p">()</span>
+<span class="p">{(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">eye</span><span class="p">())</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="s">'&gt;</span>
+</pre></div>
+
+<h5>
+<a name="ones" class="anchor" href="#ones"><span class="octicon octicon-link"></span></a><strong>ones()</strong>
+</h5>
+
+<p>Return a <code>pykov.Vector()</code> instance with entries equal to 1.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">ones</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">ones</span><span class="p">())</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="s">'&gt;</span>
+</pre></div>
+
+<h5>
+<a name="trace" class="anchor" href="#trace"><span class="octicon octicon-link"></span></a><strong>trace()</strong>
+</h5>
+
+<p>Return the matrix <a href="http://en.wikipedia.org/wiki/Trace_%28linear_algebra%29">trace</a>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span>
+<span class="mf">0.7</span>
+</pre></div>
+
+<hr>
+
+<h3>
+<a name="chain-class" class="anchor" href="#chain-class"><span class="octicon octicon-link"></span></a>Chain class</h3>
+
+<p>The <code>pykov.Chain</code> class inherits from <code>pykov.Matrix</code> class.
+The dict <code>key</code> is a tuple of states, the dict <code>value</code> is the transition
+probability to go from the first state to the second state, in other words
+pykov describes the transitions of a Markov chain with a <em>right</em> stochastic matrix.</p>
+
+<h4>
+<a name="chain-methods" class="anchor" href="#chain-methods"><span class="octicon octicon-link"></span></a>Chain methods</h4>
+
+<h5>
+<a name="adjacency" class="anchor" href="#adjacency"><span class="octicon octicon-link"></span></a><strong>adjacency()</strong>
+</h5>
+
+<p>Return the <a href="http://en.wikipedia.org/wiki/Adjacency_matrix">adjacency matrix</a>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">adjacency</span><span class="p">()</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mi">1</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">adjacency</span><span class="p">())</span>
+<span class="o">&lt;</span><span class="k">class</span> <span class="err">'</span><span class="nc">pykov</span><span class="o">.</span><span class="n">Matrix</span><span class="s">'&gt;</span>
+</pre></div>
+
+<h5>
+<a name="powp-n" class="anchor" href="#powp-n"><span class="octicon octicon-link"></span></a><strong>pow(p, n)</strong>
+</h5>
+
+<p>Find the probability distribution after <code>n</code> steps, starting from an initial <code>pykov.Vector()</code> <code>p</code>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7629999999999999</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.23699999999999996</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">T</span> <span class="o">*</span> <span class="n">T</span> <span class="c">#not efficient</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7629999999999999</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.23699999999999996</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="movestate" class="anchor" href="#movestate"><span class="octicon octicon-link"></span></a><strong>move(state)</strong>
+</h5>
+
+<p>Do one step from the indicated <code>state</code> to one of its successors, chosen at random according to the transition probability. Return the new state.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="s">'A'</span><span class="p">)</span>
+<span class="s">'B'</span>
+</pre></div>
+
+<h5>
+<a name="walksteps-startnone-stopnone" class="anchor" href="#walksteps-startnone-stopnone"><span class="octicon octicon-link"></span></a><strong>walk(steps, start=None, stop=None)</strong>
+</h5>
+
+<p>Return a random walk of n <code>steps</code>, starting and stopping at the indicated states.  If not indicated, then the starting state is chosen according to the steady state probability. If the stopping state is reached before to do n steps, then the walker stops.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">]</span>
+</pre></div>
+
+<h5>
+<a name="walk_probabilitywalk" class="anchor" href="#walk_probabilitywalk"><span class="octicon octicon-link"></span></a><strong>walk_probability(walk)</strong>
+</h5>
+
+<p>Return the <em>logarithm</em> of the <strong>walk</strong> probability (see <code>walk()</code> method). Impossible walks have probability equal to zero.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">walk_probability</span><span class="p">([</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">])</span>
+<span class="o">-</span><span class="mf">1.917322692203401</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">probability</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.917322692203401</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">probability</span>
+<span class="mf">0.147</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">walk_probability</span><span class="p">([</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="mf">0.0</span>
+</pre></div>
+
+<h5>
+<a name="steady" class="anchor" href="#steady"><span class="octicon octicon-link"></span></a><strong>steady()</strong>
+</h5>
+
+<p>Return the steady state, i.e. the equilibrium distribution of the chain.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">steady</span><span class="p">()</span>
+<span class="p">{</span><span class="s">'A'</span><span class="p">:</span> <span class="mf">0.7692307692307676</span><span class="p">,</span> <span class="s">'B'</span><span class="p">:</span> <span class="mf">0.23076923076923028</span><span class="p">}</span>
+</pre></div>
+
+<p>Since Pykov describes the chain with a right stochatic matrix,
+the steady state $x$ satisfies at the condition $p=pT$
+and it is calculated with the <em>inverse iteration method</em> 
+$Q^t x = e$, where $Q = I - T$ and $e = (0,0,...,1)$.
+Moreover, the Markov chain is assumed to be ergodic, i.e. the transition matrix
+must be irreducible and acyclic.
+You can easily test such properties by means of
+<a href="http://networkx.github.io/">NetworkX</a>, let's see how:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">networkx</span> <span class="kn">as</span> <span class="nn">nx</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_strongly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="c"># is irreducible</span>
+<span class="bp">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_aperiodic</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="bp">True</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_strongly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span> <span class="c"># is irreducible</span>
+<span class="bp">False</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_aperiodic</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="bp">True</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'C'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">,</span> <span class="p">(</span><span class="s">'C'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_strongly_connected</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="bp">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_aperiodic</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="bp">False</span>
+</pre></div>
+
+<p>Often, Markov chains created from raw data are not irreducibles.
+In such cases, the Markov chain may be defined by means of the
+largest strongly connected component of the associated graph.
+Strongly connected components can be found with NetworkX:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">strongly_connected_components</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+</pre></div>
+
+<p>For further details on the inverse iteration method,
+have a look at <em>W. Stewart, Introduction to the Numerical Solution of
+Markov Chains, Princeton University Press, Chichester, West Sussex, 1994</em>.</p>
+
+<h5>
+<a name="mixing_timecutoff025-jump1-pnone" class="anchor" href="#mixing_timecutoff025-jump1-pnone"><span class="octicon octicon-link"></span></a><strong>mixing_time(cutoff=0.25, jump=1, p=None)</strong>
+</h5>
+
+<p>Return the <a href="http://en.wikipedia.org/wiki/Markov_chain_mixing_time">mixing time</a>, defined as the number of steps needed to have $|pT^n - \pi|&lt;0.25$, where $\pi$ is the steady state $\pi = \pi T$.</p>
+
+<p>If the initial distribution <code>p</code> is not indicated, then the iteration starts from the less probable state of the steady distribution. The parameter <code>jump</code> controls the iteration step, for example with <code>jump=2</code> n has values 2,4,6,8,..</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">d</span> <span class="o">=</span> <span class="p">{(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">mixing_time</span><span class="p">()</span>
+<span class="mi">2</span>
+</pre></div>
+
+<h5>
+<a name="entropypnone-normfalse" class="anchor" href="#entropypnone-normfalse"><span class="octicon octicon-link"></span></a><strong>entropy(p=None, norm=False)</strong>
+</h5>
+
+<p>Return the Chain entropy, defined as $H = \sum_i \pi_i H_i$, where $H_i=\sum_j T_{ij}\ln T_{ij}$.
+If <code>p</code> is not <code>None</code>, then the entropy is calculated with the indicated probability <code>pykov.Vector()</code>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span>
+<span class="mf">0.46989561696530169</span>
+</pre></div>
+
+<p>With <strong>norm=True</strong> entropy belongs to [0,1].</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">entropy</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="mf">0.33895603665233132</span>
+</pre></div>
+
+<p>For further details, have a look at <em>Khinchin A. I., Mathematical Foundations of Information Theory, Dover, 1957</em>.</p>
+
+<h5>
+<a name="mfpt_tostate" class="anchor" href="#mfpt_tostate"><span class="octicon octicon-link"></span></a><strong>mfpt_to(state)</strong>
+</h5>
+
+<p>Return the Mean First Passage Times of every state <em>to</em> the indicated <code>state</code>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">d</span> <span class="o">=</span> <span class="p">{(</span><span class="s">'R'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'R'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span> <span class="s">'S'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'S'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.25</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'R'</span><span class="p">):</span> <span class="mf">0.5</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span> <span class="s">'N'</span><span class="p">):</span> <span class="mf">0.0</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">mfpt_to</span><span class="p">(</span><span class="s">'R'</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'S'</span><span class="p">:</span> <span class="mf">3.333333333333333</span><span class="p">,</span> <span class="s">'N'</span><span class="p">:</span> <span class="mf">2.666666666666667</span><span class="p">}</span> <span class="c">#mfpt from 'S' to 'R' is 3.33</span>
+</pre></div>
+
+<p>See also <em>Kemeny J. G. and Snell, J. L., Finite Markov Chains. Springer-Verlag: New York, 1976</em>.</p>
+
+<h5>
+<a name="absorbing_timetransient_set" class="anchor" href="#absorbing_timetransient_set"><span class="octicon octicon-link"></span></a><strong>absorbing_time(transient_set)</strong>
+</h5>
+
+<p>Mean number of steps needed to leave the <code>transient_set</code>, return the <code>pykov.Vector()</code> <code>tau</code> where <code>tau[i]</code> is the mean number of steps needed to leave the transient set starting from state <code>i</code>. The parameter <code>transient_set</code> is a subset of states (iterable).</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">d</span> <span class="o">=</span> <span class="p">{(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">({</span><span class="s">'N'</span><span class="p">:</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s">'S'</span><span class="p">:</span><span class="o">.</span><span class="mi">7</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">absorbing_time</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">tau</span>
+<span class="p">{</span><span class="s">'S'</span><span class="p">:</span> <span class="mf">3.333333333333333</span><span class="p">,</span> <span class="s">'N'</span><span class="p">:</span> <span class="mf">2.6666666666666665</span><span class="p">}</span>
+</pre></div>
+
+<p>In other words, the mean number of steps in order to leave states <code>'S'</code> and <code>'N'</code> starting from <code>'S'</code> is 3.33.
+It is sufficient to calculate <code>p * tau</code> in order to weight the mean times according an initial distribution <code>p</code>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">*</span> <span class="n">tau</span>
+<span class="mf">3.1333333333333329</span>
+</pre></div>
+
+<p>In order to better understand the meaning of the method, the calculation of the previous example can be approximated by means of many random walkers:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="mi">10000000</span><span class="p">,</span><span class="s">"S"</span><span class="p">,</span><span class="s">"R"</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)])</span>
+<span class="mf">3.3326020000000001</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="mi">10000000</span><span class="p">,</span><span class="s">"N"</span><span class="p">,</span><span class="s">"R"</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000000</span><span class="p">)])</span>
+<span class="mf">2.6665549999999998</span>
+</pre></div>
+
+<h5>
+<a name="absorbing_tourp-transient_setnone" class="anchor" href="#absorbing_tourp-transient_setnone"><span class="octicon octicon-link"></span></a><strong>absorbing_tour(p, transient_set=None)</strong>
+</h5>
+
+<p>Return a <code>pykov.Vector()</code> <code>v</code>, where <code>v[i]</code> is the mean time the process is in the transient state <code>i</code> before leaving the transient set.</p>
+
+<p>Note that <code>v.sum()</code> is equal to <code>p * tau</code> (see <code>absorbing_time()</code> method).
+If not specified, the transient set is defined as the set of states in vector <code>p</code>.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">d</span> <span class="o">=</span> <span class="p">{(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'R'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">0.</span><span class="p">,</span> <span class="p">(</span><span class="s">'N'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+         <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'R'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'N'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="p">(</span><span class="s">'S'</span><span class="p">,</span><span class="s">'S'</span><span class="p">):</span><span class="mf">1.</span><span class="o">/</span><span class="mi">2</span><span class="p">}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Vector</span><span class="p">({</span><span class="s">'N'</span><span class="p">:</span><span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="s">'S'</span><span class="p">:</span><span class="o">.</span><span class="mi">7</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">absorbing_tour</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="p">{</span><span class="s">'S'</span><span class="p">:</span> <span class="mf">2.2666666666666666</span><span class="p">,</span> <span class="s">'N'</span><span class="p">:</span> <span class="mf">0.8666666666666669</span><span class="p">}</span>
+</pre></div>
+
+<h5>
+<a name="fundamental_matrix" class="anchor" href="#fundamental_matrix"><span class="octicon octicon-link"></span></a><strong>fundamental_matrix()</strong>
+</h5>
+
+<p>Return the fundamental matrix, have a look at <em>Kemeny J. G. and Snell J. L., Finite Markov Chains. Springer-Verlag: New York, 1976</em> for further details.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">fundamental_matrix</span><span class="p">()</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.17751479289940991</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.053254437869822958</span><span class="p">,</span>
+<span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.94674556213017902</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.82248520710059214</span><span class="p">}</span>
+</pre></div>
+
+<p>Note that the fundamental matrix is not sparse.</p>
+
+<h5>
+<a name="kemeny_constant" class="anchor" href="#kemeny_constant"><span class="octicon octicon-link"></span></a><strong>kemeny_constant()</strong>
+</h5>
+
+<p>Return the Kemeny constant of the transition matrix.</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">T</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">Chain</span><span class="p">({(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'B'</span><span class="p">):</span> <span class="o">.</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="o">.</span><span class="mi">7</span><span class="p">,</span> <span class="p">(</span><span class="s">'B'</span><span class="p">,</span><span class="s">'A'</span><span class="p">):</span> <span class="mf">1.</span><span class="p">})</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">T</span><span class="o">.</span><span class="n">kemeny_constant</span><span class="p">()</span>
+<span class="mf">1.7692307692307712</span>
+</pre></div>
+
+<hr>
+
+<h2>
+<a name="utilities" class="anchor" href="#utilities"><span class="octicon octicon-link"></span></a>Utilities</h2>
+
+<p>Pykov comes with an utility useful to create a <code>pykov.Chain()</code> from a text file, let say file <code>/mypath/mat</code>, which contains the transition matrix defined with the following format:</p>
+
+<div class="highlight highlight-python"><pre><span class="n">A</span> <span class="n">A</span> <span class="o">.</span><span class="mi">7</span>
+<span class="n">A</span> <span class="n">B</span> <span class="o">.</span><span class="mi">3</span>
+<span class="n">B</span> <span class="n">A</span> <span class="mi">1</span>
+</pre></div>
+
+<p>The <code>pykov.Chain()</code> instance is created with the command:</p>
+
+<div class="highlight highlight-python"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">P</span> <span class="o">=</span> <span class="n">pykov</span><span class="o">.</span><span class="n">readmat</span><span class="p">(</span><span class="s">'/mypath/mat'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">P</span>
+<span class="p">{(</span><span class="s">'B'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'B'</span><span class="p">):</span> <span class="mf">0.3</span><span class="p">,</span> <span class="p">(</span><span class="s">'A'</span><span class="p">,</span> <span class="s">'A'</span><span class="p">):</span> <span class="mf">0.7</span><span class="p">}</span>
+</pre></div>
+
+<hr>
+
+<blockquote>
+<p>Docs written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/riccardoscalco/Pykov/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/riccardoscalco/Pykov/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/riccardoscalco/Pykov"></a> is maintained by <a href="https://github.com/riccardoscalco">riccardoscalco</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-55880103-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
