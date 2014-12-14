@@ -31,7 +31,9 @@ Open your favourite Python shell and import pykov:
 ```
 
 ###Vector class
-The **Vector class** inherits from python `dict`, which means it has the same behaviors and features of python dictionaries, with few exceptions. The states and the corresponding probabilities are the keys and the values of the dictionary, respectively.
+The **Vector class** inherits from python `collections.OrderedDict`, which means it has the same behaviors and features of python ordered dictionaries, with few exceptions. The states and the corresponding probabilities are the keys and the values of the dictionary, respectively.
+
+collections.OrderedDict is used instead of the default dict because from Python 3.3 onwards, dict is non-deterministic for security reasons (see this [stackoverflow question](http://stackoverflow.com/questions/14956313/dictionary-ordering-non-deterministic-in-python3)). For programs that needs determinism (such as simulations), an OrderedDict should be passed. But for programs where determinism is not an issue, dict can be used.
 
 Definition of a `pykov.Vector()`:
 ```python
@@ -43,7 +45,14 @@ You can *get* and *set* states in many ways:
 >>> p
 {'A': 0.2}
 
+>>> # Non-deterministic example
 >>> p = pykov.Vector({'A':.3, 'B':.7})
+>>> p
+{'A':0.3, 'B':0.7}
+
+>>> # Deterministic example
+>>> data = collections.OrderedDict((('A', .3), ('B', .7)))
+>>> p = pykov.Vector(data)
 >>> p
 {'A':0.3, 'B':0.7}
 
@@ -191,7 +200,7 @@ Note that the Kullback-Leibler distance is not symmetric.
 ------------
 
 ###Matrix class
-The `pykov.Matrix()` class inherits from python dictionaries. Dict `keys` are `tuple` of states, dict `values` are the matrix entries. Indexes do not need to be `int`, they can be `string`, as the states of a `pykov.Vector()`.
+The `pykov.Matrix()` class inherits from python collections.OrderedDict. Similar to the default dict, OrderedDict `keys` are `tuple` of states, OrderedDict `values` are the matrix entries. Indexes do not need to be `int`, they can be `string`, as the states of a `pykov.Vector()`.
 
 Definition of  `pykov.Matrix()`:
 ```python
@@ -207,11 +216,24 @@ You can *get* and *set* items in many ways:
 >>> T
 {('A', 'B'): 0.3, ('A', 'A'): 0.7}
 
+>>> # Non-deterministic example
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
 >>> T[('A','B')]
 0.3
 >>> T['A','B']
 0.3
+
+>>> # deterministic example
+>>> data = collections.OrderedDict((
+                (('A','B'), .3), 
+                (('A','A'), .7), 
+                (('B','A'), 1.)))
+>>> T = pykov.Matrix(data)
+>>> T[('A','B')]
+0.3
+>>> T['A','B']
+0.3
+
 ```
 Items not belonging to the matrix have value equal to zero, moreover items with value equal to zero are not shown:
 ```python
@@ -379,7 +401,7 @@ Return the matrix [trace](http://en.wikipedia.org/wiki/Trace_%28linear_algebra%2
 ###Chain class
 
 The `pykov.Chain` class inherits from `pykov.Matrix` class.
-The dict `key` is a tuple of states, the dict `value` is the transition
+The OrderedDict `key` is a tuple of states, the OrderedDict `value` is the transition
 probability to go from the first state to the second state, in other words
 pykov describes the transitions of a Markov chain with a *right* stochastic matrix.
 

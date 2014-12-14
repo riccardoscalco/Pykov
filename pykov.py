@@ -34,6 +34,8 @@ import math
 import six
 import numpy
 
+from collections import OrderedDict
+
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
 
@@ -95,7 +97,7 @@ class PykovError(Exception):
         return repr(self.value)
 
 
-class Vector(dict):
+class Vector(OrderedDict):
 
     """
     """
@@ -107,6 +109,8 @@ class Vector(dict):
         >>> pykov.Vector(A=.3, B=.7)
         {'A':.3, 'B':.7}
         """
+        OrderedDict.__init__(self)
+        
         if data:
             self.update([item for item in six.iteritems(data)
                 if abs(item[1]) > numpy.finfo(numpy.float).eps])
@@ -123,7 +127,7 @@ class Vector(dict):
         0.0
         """
         try:
-            return dict.__getitem__(self, key)
+            return OrderedDict.__getitem__(self, key)
         except KeyError:
             return 0.0
 
@@ -138,7 +142,7 @@ class Vector(dict):
         {'C': 0.4, 'B': 0.6}
         """
         if abs(value) > numpy.finfo(numpy.float).eps:
-            dict.__setitem__(self, key, value)
+            OrderedDict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
 
@@ -380,7 +384,7 @@ class Vector(dict):
             return result
 
 
-class Matrix(dict):
+class Matrix(OrderedDict):
 
     """
     """
@@ -389,6 +393,8 @@ class Matrix(dict):
         """
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         """
+        OrderedDict.__init__(self)
+        
         if data:
             self.update([item for item in six.iteritems(data)
                 if abs(item[1]) > numpy.finfo(numpy.float).eps])
@@ -404,7 +410,7 @@ class Matrix(dict):
         0.0
         """
         try:
-            return dict.__getitem__(self, args[0])
+            return OrderedDict.__getitem__(self, args[0])
         except KeyError:
             return 0.0
 
@@ -436,7 +442,7 @@ class Matrix(dict):
         {'A', 'B'}
         """
         if abs(value) > numpy.finfo(numpy.float).eps:
-            dict.__setitem__(self, key, value)
+            OrderedDict.__setitem__(self, key, value)
         elif key in self:
             del(self[key])
 
@@ -448,13 +454,13 @@ class Matrix(dict):
         >>> T
         {('A', 'B'): 0.3, ('A', 'A'): 0.7}
         """
-        dict.__delitem__(self, key)
+        OrderedDict.__delitem__(self, key)
 
     @_del_cache
     def pop(self, key):
         """
         Remove specified key and return the corresponding value.
-        See: help(dict.pop)
+        See: help(OrderedDict.pop)
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.pop(('A','B'))
@@ -462,13 +468,13 @@ class Matrix(dict):
         >>> T
         {('B', 'A'): 1.0, ('A', 'A'): 0.7}
         """
-        return dict.pop(self, key)
+        return OrderedDict.pop(self, key)
 
     @_del_cache
     def popitem(self):
         """
         Remove and return some (key, value) pair as a 2-tuple.
-        See: help(dict.popitem)
+        See: help(OrderedDict.popitem)
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.popitem()
@@ -476,26 +482,26 @@ class Matrix(dict):
         >>> T
         {('A', 'B'): 0.3, ('A', 'A'): 0.7}
         """
-        return dict.popitem(self)
+        return OrderedDict.popitem(self)
 
     @_del_cache
     def clear(self):
         """
         Remove all keys.
-        See: help(dict.clear)
+        See: help(OrderedDict.clear)
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.clear()
         >>> T
         {}
         """
-        dict.clear(self)
+        OrderedDict.clear(self)
 
     @_del_cache
     def update(self, other):
         """
         Update with keys and their values present in other.
-        See: help(dict.update)
+        See: help(OrderedDict.update)
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> d = {('B', 'C'):2}
@@ -503,12 +509,12 @@ class Matrix(dict):
         >>> T
         {('B', 'A'): 1.0, ('B', 'C'): 2, ('A', 'B'): 0.3, ('A', 'A'): 0.7}
         """
-        dict.update(self, other)
+        OrderedDict.update(self, other)
 
     @_del_cache
     def setdefault(self, k, *args):
         """
-        See: help(dict.setdefault)
+        See: help(OrderedDict.setdefault)
 
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.setdefault(('A','A'),1)
@@ -520,7 +526,7 @@ class Matrix(dict):
         >>> T
         {('B', 'A'): 1.0, ('A', 'B'): 0.3, ('A', 'A'): 0.7, ('A', 'C'): 1}
         """
-        return dict.setdefault(self, k, *args)
+        return OrderedDict.setdefault(self, k, *args)
 
     def copy(self):
         """
@@ -563,7 +569,7 @@ class Matrix(dict):
         Return a numpy.matrix object from a dictionary.
 
         -- Parameters --
-        t_ij : the dict, values must be real numbers, keys should be tuples of
+        t_ij : the OrderedDict, values must be real numbers, keys should be tuples of
         two strings.
         el2pos : see _map()
         """
@@ -639,7 +645,7 @@ class Matrix(dict):
             else:
                 return self._pred
         except AttributeError:
-            self._pred = dict([(state, Vector()) for state in self.states()])
+            self._pred = OrderedDict([(state, Vector()) for state in self.states()])
             for link, probability in six.iteritems(self):
                 self._pred[link[1]][link[0]] = probability
             if key is not None:
@@ -664,7 +670,7 @@ class Matrix(dict):
             else:
                 return self._succ
         except AttributeError:
-            self._succ = dict([(state, Vector()) for state in self.states()])
+            self._succ = OrderedDict([(state, Vector()) for state in self.states()])
             for link, probability in six.iteritems(self):
                 self._succ[link[0]][link[1]] = probability
             if key is not None:
@@ -690,7 +696,7 @@ class Matrix(dict):
         >>> T.remove(['A','B'])
         {('C', 'D'): 0.5, ('D', 'C'): 1.0}
         """
-        return Matrix(dict([(key, value) for key, value in six.iteritems(self) if
+        return Matrix(OrderedDict([(key, value) for key, value in six.iteritems(self) if
                             key[0] not in states and key[1] not in states]))
 
     def states(self):
@@ -746,7 +752,7 @@ class Matrix(dict):
             res._from_dok_(C, p2e)
             return res
         elif isinstance(v, int) or isinstance(v, float):
-            return Matrix(dict([(key, value * v) for key, value in
+            return Matrix(OrderedDict([(key, value * v) for key, value in
                                 six.iteritems(self)]))
         else:
             raise TypeError('unsupported operand type(s) for *:' +
@@ -759,7 +765,7 @@ class Matrix(dict):
         {('B', 'A'): 3.0, ('A', 'B'): 0.9, ('A', 'A'): 2.1}
         """
         if isinstance(v, int) or isinstance(v, float):
-            return Matrix(dict([(key, value * v) for key, value in
+            return Matrix(OrderedDict([(key, value * v) for key, value in
                                 six.iteritems(self)]))
         else:
             raise TypeError('unsupported operand type(s) for *:' +
@@ -815,7 +821,7 @@ class Matrix(dict):
         >>> T.eye()
         {('A', 'A'): 1., ('B', 'B'): 1.}
         """
-        return Matrix(dict([((state, state), 1.) for state in self.states()]))
+        return Matrix(OrderedDict([((state, state), 1.) for state in self.states()]))
 
     def ones(self):
         """
@@ -825,7 +831,7 @@ class Matrix(dict):
         >>> T.ones()
         {'A': 1.0, 'B': 1.0}
         """
-        return Vector(dict([(state, 1.) for state in self.states()]))
+        return Vector(OrderedDict([(state, 1.) for state in self.states()]))
 
     def transpose(self):
         """
@@ -835,7 +841,7 @@ class Matrix(dict):
         >>> T.transpose()
         {('B', 'A'): 0.3, ('A', 'B'): 1.0, ('A', 'A'): 0.7}
         """
-        return Matrix(dict([((key[1], key[0]), value) for key, value in
+        return Matrix(OrderedDict([((key[1], key[0]), value) for key, value in
                             six.iteritems(self)]))
 
     def _UMPFPACKSolve(self, b, x=None, method='UMFPACK_A'):
@@ -1024,7 +1030,7 @@ class Chain(Matrix):
         >>> T.adjacency()
         {('B', 'A'): 1, ('A', 'B'): 1, ('A', 'A'): 1}
         """
-        return Matrix(dict.fromkeys(self, 1))
+        return Matrix(OrderedDict.fromkeys(self, 1))
 
     def walk(self, steps, start=None, stop=None):
         """
