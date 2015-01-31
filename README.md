@@ -132,7 +132,7 @@ Return a list of tuples `(state, probability)` sorted according the probability 
 >>> p.sort(reverse=True)
 [('C', 0.6), ('A', 0.3), ('B', 0.1)]
 ```
-#####**choose()**
+#####**choose(random_func=None)**
 Choose a state at random, according to its probability.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -143,6 +143,15 @@ Choose a state at random, according to its probability.
 >>> p.choose()
 'A'
 ```
+
+Optionally, if you need to supply your own random number generator, you can pass a function that takes two inputs (the min and max) and Pykov will use that function.
+```python
+>>> def FakeRandom(min, max): return 0.01
+>>> p = pykov.Vector(A=.05, B=.4, C=.4, D=.15)
+>>> p.choose(FakeRandom)
+'A'        
+```
+
 
 #####**normalize()**
 Normalize the `pykov.Vector`, after normalization the probabilities sum to 1.
@@ -434,6 +443,13 @@ Do one step from the indicated `state` to one of its successors, chosen at rando
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
 >>> T.move('A')
 'B'
+```
+
+Optionally, if you need to supply your own random number generator, you can pass a function that takes two inputs (the min and max) and Pykov will use that function.
+```python
+>>> def FakeRandom(min, max): return 0.01
+>>> T.move('A', FakeRandom)
+'B'        
 ```
 
 #####**walk(steps, start=None, stop=None)**

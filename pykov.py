@@ -281,19 +281,27 @@ class Vector(OrderedDict):
         for k in six.iterkeys(self):
             self[k] = self[k] / s
 
-    def choose(self):
+    def choose(self, random_func = None):
         """
-        Choose a state according to its probability.
+        Choose a state according to its probability. 
 
         >>> p = pykov.Vector(A=.3, B=.7)
         >>> p.choose()
         'B'
+        
+        Optionally, a function that generates a random number can be supplied.
+        >>> def FakeRandom(min, max): return 0.01
+        >>> p = pykov.Vector(A=.05, B=.4, C=.4, D=.15)
+        >>> p.choose(FakeRandom)
+        'A'        
 
         .. seealso::
 
            `Kevin Parks recipe <http://code.activestate.com/recipes/117241/>`_
         """
-        n = random.uniform(0, 1)
+        if random_func is None:
+           random_func = random.uniform 
+        n = random_func(0, 1)
         for state, prob in six.iteritems(self):
             if n < prob:
                 break
@@ -877,15 +885,21 @@ class Chain(Matrix):
     """
     """
 
-    def move(self, state):
+    def move(self, state, random_func = None):
         """
         Do one step from the indicated state, and return the final state.
 
         >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.move('A')
         'B'
+
+        Optionally, a function that generates a random number can be supplied.
+        >>> def FakeRandom(min, max): return 0.01
+        >>> T.move('A', FakeRandom)
+        'B'        
+
         """
-        return self.succ(state).choose()
+        return self.succ(state).choose(random_func)
 
     def pow(self, p, n):
         """
