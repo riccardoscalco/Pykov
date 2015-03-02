@@ -39,7 +39,7 @@ from collections import OrderedDict
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
 
-__date__ = 'Nov 2014'
+__date__ = 'March 2015'
 
 __version__ = 1.1
 
@@ -187,7 +187,7 @@ class Vector(OrderedDict):
         """
         if isinstance(M, int) or isinstance(M, float):
             result = Vector()
-            for state, value in six.iteritems():
+            for state, value in six.iteritems(self):
                 result[state] = value * M
             return result
         else:
