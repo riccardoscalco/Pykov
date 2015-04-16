@@ -723,7 +723,20 @@ class Matrix(OrderedDict):
                 self._states.add(link[0])
                 self._states.add(link[1])
             return self._states
-
+    
+    def __pow__(self, n):
+        if isinstance(n, int) or isinstance(n, float):
+            T = self.eye()
+            if n >= 0:
+                for i in range(n):
+                    T = T * self
+            else:
+                raise NotImplementedError()
+            return T
+        else:
+            raise TypeError('unsupported operand type(s) for **:' +
+                ' \'Matrix\' and ' + repr(type(n))[7:-1])
+    
     def __mul__(self, v):
         """
         >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
