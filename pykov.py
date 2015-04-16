@@ -1268,7 +1268,28 @@ class Chain(Matrix):
         """
         Z = self.fundamental_matrix()
         return Z.trace()
-        
+
+
+    def accessibility_matrix(self):
+        """
+        Return the accessibility matrix of the Markov chain.
+
+        ..see also: http://www.ssc.wisc.edu/~jmontgom/commclasses.pdf
+        """
+        el2pos, pos2el = self._el2pos_()
+        Z = self.adjacency()
+        I = self.eye()
+        n = len(self.states())
+
+        A = (I + Z)**(n-1)
+        numpy_A = A._numpy_mat(el2pos)
+        numpy_A = numpy_A > 0
+        numpy_A = numpy_A.astype(int)
+        res = Matrix()
+        res._from_numpy_mat(numpy_A, pos2el)
+        return res
+
+
 
 def readmat(filename):
     """
