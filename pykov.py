@@ -725,17 +725,19 @@ class Matrix(OrderedDict):
             return self._states
     
     def __pow__(self, n):
-        if isinstance(n, int) or isinstance(n, float):
-            T = self.eye()
-            if n >= 0:
-                for i in range(n):
-                    T = T * self
-            else:
-                raise NotImplementedError()
-            return T
-        else:
-            raise TypeError('unsupported operand type(s) for **:' +
-                ' \'Matrix\' and ' + repr(type(n))[7:-1])
+        """
+        >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
+        >>> T**2
+        {('A', 'B'): 0.21, ('B', 'A'): 0.70, ('A', 'A'): 0.79, ('B', 'B'): 0.30}
+        >>> T**0
+        {('A', 'A'): 1.0, ('B', 'B'): 1.0}
+        """
+        el2pos, pos2el = self._el2pos_()
+        P = self._numpy_mat(el2pos)
+        P = P**n
+        res = Matrix()
+        res._from_numpy_mat(P, pos2el)
+        return res
     
     def __mul__(self, v):
         """
