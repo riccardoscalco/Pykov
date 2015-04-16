@@ -738,6 +738,9 @@ class Matrix(OrderedDict):
         res = Matrix()
         res._from_numpy_mat(P, pos2el)
         return res
+
+    def pow(self, n):
+        return self.__pow__(n)
     
     def __mul__(self, v):
         """
@@ -928,15 +931,7 @@ class Chain(Matrix):
         >>> p * T * T * T
         {'A': 0.7629999999999999, 'B': 0.23699999999999996}
         """
-        e2p, p2e = self._el2pos_()
-        A = self._dok_(e2p, 'transpose').tocsr()
-        x = p._toarray(e2p)
-        for i in range(n):
-            y = A.dot(x)
-            x = y.copy()
-        res = Vector()
-        res._fromarray(y, e2p)
-        return res
+        return p * self**n
 
     def steady(self):
         """
@@ -1273,6 +1268,19 @@ class Chain(Matrix):
         """
         Z = self.fundamental_matrix()
         return Z.trace()
+
+    def accessibility_matrix(self):
+        """
+        Return the accessibility matrix of the Markov chain.
+
+        ..see also: http://www.ssc.wisc.edu/~jmontgom/commclasses.pdf
+        """
+        el2pos, pos2el = self._el2pos_()
+        Z = self.adjacency()
+        I = self.eye()
+        n = len(self.states())
+        A = (I + Z)**(n-1)
+
 
 
 def readmat(filename):
