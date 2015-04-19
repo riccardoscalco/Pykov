@@ -35,6 +35,7 @@ import six
 import numpy
 
 from collections import OrderedDict
+from sets import Set
 
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
@@ -1289,7 +1290,60 @@ class Chain(Matrix):
         res._from_numpy_mat(numpy_A, pos2el)
         return res
 
+    def is_accessible(self, i, j):
+        """
+        Return whether state j is accessible from state i.
+        """
 
+        A = self.accessibility_matrix()
+        return A.get((i, j)) > 0
+
+    def communicates(self, i, j):
+        """
+        Return whether states i and j communicate.
+        """
+        return self.is_accessible(i, j) and self.is_accessible(j, i)
+
+    def communication_classes(self):
+        """
+        Return a Set of all communication classes of the Markov chain.
+
+        ..see also: http://www.ssc.wisc.edu/~jmontgom/commclasses.pdf
+
+        >>> T = pykov.Chain({('A','A'): 1.0, ('B','B'): 1.0})
+        >>> T.communication_classes()
+        """
+        el2pos, pos2el = self._el2pos_()
+        A = self.accessibility_matrix()
+
+        numpy_A = A._numpy_mat(el2pos)
+        numpy_A_trans = numpy.transpose(numpy_A)
+        numpy_res = numpy.logical_and(numpy_A, numpy_A_trans)
+        numpy_res = numpy_res.astype(int)
+
+        #remove duplicate rows
+        #remaining rows will give communication
+        #ref: http://stackoverflow.com/questions/16970982/find-unique-rows-in-numpy-array
+        a = numpy_res
+        b = numpy.ascontiguousarray(a).view(
+            numpy.dtype(
+                (numpy.void, a.dtype.itemsize * a.shape[1])
+                )
+            )
+        _, idx = numpy.unique(b, return_index=True)
+
+        unique_a = a[idx]
+
+        res = Set()
+        for row in unique_a:
+            #each iteration here is a comm. class
+            comm_class = Set()
+            number_of_elements = len(A.states())
+            for el in range(number_of_elements):
+                if row[0, el] == 1:
+                    comm_class.add(pos2el[el])
+            res.add(comm_class)
+        return res
 
 def readmat(filename):
     """
