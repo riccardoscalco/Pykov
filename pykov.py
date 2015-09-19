@@ -28,17 +28,21 @@
    Riccardo Scalco <riccardo.scalco@gmail.com>
 
 """
-
 import random
 import math
 import six
 import numpy
+import sys
 
 from collections import OrderedDict
-from sets import Set
 
 import scipy.sparse as ss
 import scipy.sparse.linalg as ssl
+
+if sys.version_info < (2, 6):
+   from sets import Set
+else:
+   Set = set
 
 __date__ = 'March 2015'
 
