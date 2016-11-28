@@ -1068,10 +1068,10 @@ class Chain(Matrix):
 
         .. note::
 
-           If not indicated, then the starting state is chosen according
-           to its steady probability.
-           If the stopping state is reached before to do n steps, then the walker
-           stops.
+           If not indicated or is `None`, then the starting state is chosen
+           according to its steady probability.
+           If the stopping state is not `None`, the random walk stops early if
+           the stopping state is reached.
 
         >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
         >>> T.walk(10)
@@ -1079,14 +1079,14 @@ class Chain(Matrix):
         >>> T.walk(10,'B','B')
         ['B', 'A', 'A', 'A', 'A', 'A', 'B']
         """
-        if not start:
+        if start is None:
             start = self.steady().choose()
-        if not stop:
+        if stop is None:
             result = [start]
             for i in range(steps):
                 result.append(self.move(result[-1]))
             return result
-        if stop:
+        else:
             result = [start]
             for i in range(steps):
                 result.append(self.move(result[-1]))
