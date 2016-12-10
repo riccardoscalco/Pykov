@@ -1080,7 +1080,13 @@ class Chain(Matrix):
         ['B', 'A', 'A', 'A', 'A', 'A', 'B']
         """
         if start is None:
-            start = self.steady().choose()
+            steady = self.steady()
+            if len(steady) != 0:
+                start = steady.choose()
+            else:
+                # There is no steady state, so choose a state uniformly at
+                # random.
+                start = random.sample(self.states(), 1)[0]
         if stop is None:
             result = [start]
             for i in range(steps):
