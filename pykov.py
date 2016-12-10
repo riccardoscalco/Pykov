@@ -553,6 +553,11 @@ class Matrix(OrderedDict):
         """
         return Matrix(self)
 
+    def __reduce__(self):
+        """Return state information for pickling"""
+        # Required because we changed the OrderedDict.__init__ signature
+        return (self.__class__, (), None, None, six.iteritems(self))
+
     def _dok_(self, el2pos, method=''):
         """
         """
