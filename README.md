@@ -115,7 +115,7 @@ A `pykov.Vector()` instance can be multiplied by a scalar. The *dot product* wit
 
 #### Vector methods
 
-#####**sum()**
+##### **sum()**
 Sum the probability values.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -123,7 +123,7 @@ Sum the probability values.
 1.0
 ```
 
-#####**sort(reverse=False)**
+##### **sort(reverse=False)**
 Return a list of tuples `(state, probability)` sorted according the probability values.
 ```python
 >>> p = pykov.Vector({'A':.3, 'B':.1, 'C':.6})
@@ -132,7 +132,7 @@ Return a list of tuples `(state, probability)` sorted according the probability 
 >>> p.sort(reverse=True)
 [('C', 0.6), ('A', 0.3), ('B', 0.1)]
 ```
-#####**choose(random_func=None)**
+##### **choose(random_func=None)**
 Choose a state at random, according to its probability.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -153,7 +153,7 @@ Optionally, if you need to supply your own random number generator, you can pass
 ```
 
 
-#####**normalize()**
+##### **normalize()**
 Normalize the `pykov.Vector`, after normalization the probabilities sum to 1.
 ```python
 >>> p = pykov.Vector({'A':3, 'B':1, 'C':6})
@@ -166,7 +166,7 @@ Normalize the `pykov.Vector`, after normalization the probabilities sum to 1.
 1.0
 ```
 
-#####**copy()**
+##### **copy()**
 Return a shallow copy.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -176,7 +176,7 @@ Return a shallow copy.
 {'A': 0.3, 'B': 0.7}
 ```
 
-#####**entropy()**
+##### **entropy()**
 Return the Shannon entropy, defined as $H(p) = \sum_i p_i \ln p_i$.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -185,7 +185,7 @@ Return the Shannon entropy, defined as $H(p) = \sum_i p_i \ln p_i$.
 ```
 For further details, have a look at *Khinchin A. I., Mathematical Foundations of Information Theory Dover, 1957*.
 
-#####**dist(q)**
+##### **dist(q)**
 Return the distance to another `pykov.Vector`, defined as $d(p,q) = \sum_i | p_i - q_i |$. 
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -194,7 +194,7 @@ Return the distance to another `pykov.Vector`, defined as $d(p,q) = \sum_i | p_i
 1.0
 ```
 
-#####**relative_entropy(q)**
+##### **relative_entropy(q)**
 Return the *Kullback-Leibler* distance, defined as $d(p,q) = \sum_i p_i \ln (p_i/q_i)$.
 ```python
 >>> p = pykov.Vector(A=.3, B=.7)
@@ -208,7 +208,7 @@ Note that the Kullback-Leibler distance is not symmetric.
 
 ------------
 
-###Matrix class
+### Matrix class
 The `pykov.Matrix()` class inherits from python collections.OrderedDict. Similar to the default dict, OrderedDict `keys` are `tuple` of states, OrderedDict `values` are the matrix entries. Indexes do not need to be `int`, they can be `string`, as the states of a `pykov.Vector()`.
 
 Definition of  `pykov.Matrix()`:
@@ -242,8 +242,8 @@ You can *get* and *set* items in many ways:
 0.3
 >>> T['A','B']
 0.3
-
 ```
+
 Items not belonging to the matrix have value equal to zero, moreover items with value equal to zero are not shown:
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -293,7 +293,7 @@ A `pykov.Matrix()` instance can be multiplied by a scalar, the dot product with 
 
 #### Matrix methods
 
-#####**states()**
+##### **states()**
 Return the `set` of states.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -310,7 +310,7 @@ States without ingoing or outgoing transitions are removed from the set of state
 {'A', 'B'}
 ```
 
-#####**pred(key=None)**
+##### **pred(key=None)**
 Return the precedessors of a state (if not indicated, of all states). In matrix notation, return the column of the indicated state.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -320,7 +320,7 @@ Return the precedessors of a state (if not indicated, of all states). In matrix 
 {'A': 0.7, 'B': 1.0}
 ```
 
-#####**succ(key=None)**
+##### **succ(key=None)**
 Return the successors of a state (if not indicated, of all states). In matrix notation, return the row of the indicated state.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -330,7 +330,7 @@ Return the successors of a state (if not indicated, of all states). In matrix no
 {'A': 0.7, 'B': 0.3}
 ```
 
-#####**copy()**
+##### **copy()**
 Return a shallow copy.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -340,7 +340,7 @@ Return a shallow copy.
 {('B', 'A'): 1.0, ('A', 'B'): 0.3, ('A', 'A'): 0.7}
 ```
 
-#####**remove(states)**
+##### **remove(states)**
 Return a shallow copy of the matrix without the indicated states.
 All the links where the states appear are deleted, so that the result will not be in general a stochastic matrix.
 ```python
@@ -353,7 +353,7 @@ All the links where the states appear are deleted, so that the result will not b
 {('C', 'D'): 0.5, ('D', 'C'): 1.0}
 ```
 
-#####**stochastic()**
+##### **stochastic()**
 Change the `pykov.Matrix()` instance in a right [stochastic matrix](http://en.wikipedia.org/wiki/Stochastic_matrix).
 Set the sum of every row equal to one, raise `PykovError` if not possible.
 ```python
@@ -367,7 +367,7 @@ Set the sum of every row equal to one, raise `PykovError` if not possible.
 pykov.PykovError: 'Zero links from node C'
 ```
 
-#####**transpose()**
+##### **transpose()**
 Return the transpose of the `pykov.Matrix()` instance.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -377,7 +377,7 @@ Return the transpose of the `pykov.Matrix()` instance.
 {('A', 'B'): 0.3, ('A', 'A'): 0.7, ('B', 'A'): 1.0}
 ```
 
-#####**eye()**
+##### **eye()**
 Return the [Identity matrix](http://en.wikipedia.org/wiki/Identity_matrix).
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -387,7 +387,7 @@ Return the [Identity matrix](http://en.wikipedia.org/wiki/Identity_matrix).
 <class 'pykov.Matrix'>
 ```
 
-#####**ones()**
+##### **ones()**
 Return a `pykov.Vector()` instance with entries equal to 1.
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -397,7 +397,7 @@ Return a `pykov.Vector()` instance with entries equal to 1.
 <class 'pykov.Vector'>
 ```
 
-#####**trace()**
+##### **trace()**
 Return the matrix [trace](http://en.wikipedia.org/wiki/Trace_%28linear_algebra%29).
 ```python
 >>> T = pykov.Matrix({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -407,7 +407,7 @@ Return the matrix [trace](http://en.wikipedia.org/wiki/Trace_%28linear_algebra%2
 
 ---------------
 
-###Chain class
+### Chain class
 
 The `pykov.Chain` class inherits from `pykov.Matrix` class.
 The OrderedDict `key` is a tuple of states, the OrderedDict `value` is the transition
@@ -416,7 +416,7 @@ pykov describes the transitions of a Markov chain with a *right* stochastic matr
 
 #### Chain methods
 
-#####**adjacency()**
+##### **adjacency()**
 Return the [adjacency matrix](http://en.wikipedia.org/wiki/Adjacency_matrix).
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -426,7 +426,7 @@ Return the [adjacency matrix](http://en.wikipedia.org/wiki/Adjacency_matrix).
 <class 'pykov.Matrix'>
 ```
 
-#####**pow(p, n)**
+##### **pow(p, n)**
 Find the probability distribution after `n` steps, starting from an initial `pykov.Vector()` `p`.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -437,7 +437,7 @@ Find the probability distribution after `n` steps, starting from an initial `pyk
 {'A': 0.7629999999999999, 'B': 0.23699999999999996}
 ```
 
-#####**move(state)**
+##### **move(state)**
 Do one step from the indicated `state` to one of its successors, chosen at random according to the transition probability. Return the new state.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -452,7 +452,7 @@ Optionally, if you need to supply your own random number generator, you can pass
 'B'        
 ```
 
-#####**walk(steps, start=None, stop=None)**
+##### **walk(steps, start=None, stop=None)**
 Return a random walk of n `steps`, starting and stopping at the indicated states.  If not indicated, then the starting state is chosen according to the steady state probability. If the stopping state is reached before to do n steps, then the walker stops.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -462,7 +462,7 @@ Return a random walk of n `steps`, starting and stopping at the indicated states
 ['B', 'A', 'A', 'A', 'A', 'A', 'B']
 ```
 
-#####**walk_probability(walk)**
+##### **walk_probability(walk)**
 Return the *logarithm* of the **walk** probability (see `walk()` method). Impossible walks have probability equal to zero.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -478,7 +478,7 @@ Return the *logarithm* of the **walk** probability (see `walk()` method). Imposs
 ```
 
 
-#####**steady()**
+##### **steady()**
 Return the steady state, i.e. the equilibrium distribution of the chain.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -530,8 +530,8 @@ For further details on the inverse iteration method,
 have a look at *W. Stewart, Introduction to the Numerical Solution of
 Markov Chains, Princeton University Press, Chichester, West Sussex, 1994*.
 
-#####**mixing_time(cutoff=0.25, jump=1, p=None)**
-Return the [mixing time](http://en.wikipedia.org/wiki/Markov_chain_mixing_time), defined as the number of steps needed to have $|pT^n - \pi|<0.25$, where $\pi$ is the steady state $\pi = \pi T$.
+##### **mixing_time(cutoff=0.25, jump=1, p=None)**
+Return the [mixing time](http://en.wikipedia.org/wiki/Markov_chain_mixing_time), defined as the number of steps needed to have $|pT^n - \pi| \lt 0.25$, where $\pi$ is the steady state $\pi = \pi T$.
 
 If the initial distribution `p` is not indicated, then the iteration starts from the less probable state of the steady distribution. The parameter `jump` controls the iteration step, for example with `jump=2` n has values 2,4,6,8,..
 ```python
@@ -543,7 +543,7 @@ If the initial distribution `p` is not indicated, then the iteration starts from
 2
 ```
 
-#####**entropy(p=None, norm=False)**
+##### **entropy(p=None, norm=False)**
 Return the Chain entropy, defined as $H = \sum_i \pi_i H_i$, where $H_i=\sum_j T_{ij}\ln T_{ij}$.
 If `p` is not `None`, then the entropy is calculated with the indicated probability `pykov.Vector()`.
 ```python
@@ -558,7 +558,7 @@ With **norm=True** entropy belongs to [0,1].
 ```
 For further details, have a look at *Khinchin A. I., Mathematical Foundations of Information Theory, Dover, 1957*.
 
-#####**mfpt_to(state)**
+##### **mfpt_to(state)**
 Return the Mean First Passage Times of every state *to* the indicated `state`.
 ```python
 >>> d = {('R', 'N'): 0.25, ('R', 'S'): 0.25, ('S', 'R'): 0.25,
@@ -596,7 +596,7 @@ In order to better understand the meaning of the method, the calculation of the 
 2.6665549999999998
 ```
 
-#####**absorbing_tour(p, transient_set=None)**
+##### **absorbing_tour(p, transient_set=None)**
 Return a `pykov.Vector()` `v`, where `v[i]` is the mean time the process is in the transient state `i` before leaving the transient set.
 
 Note that `v.sum()` is equal to `p * tau` (see `absorbing_time()` method).
@@ -611,7 +611,7 @@ If not specified, the transient set is defined as the set of states in vector `p
 {'S': 2.2666666666666666, 'N': 0.8666666666666669}
 ```
 
-#####**fundamental_matrix()**
+##### **fundamental_matrix()**
 Return the fundamental matrix, have a look at *Kemeny J. G. and Snell J. L., Finite Markov Chains. Springer-Verlag: New York, 1976* for further details.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
@@ -621,7 +621,7 @@ Return the fundamental matrix, have a look at *Kemeny J. G. and Snell J. L., Fin
 ```
 Note that the fundamental matrix is not sparse.
 
-#####**kemeny_constant()**
+##### **kemeny_constant()**
 Return the Kemeny constant of the transition matrix.
 ```python
 >>> T = pykov.Chain({('A','B'): .3, ('A','A'): .7, ('B','A'): 1.})
