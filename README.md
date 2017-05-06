@@ -570,7 +570,7 @@ Return the Mean First Passage Times of every state *to* the indicated `state`.
 ```
 See also *Kemeny J. G. and Snell, J. L., Finite Markov Chains. Springer-Verlag: New York, 1976*.
 
-#####**absorbing_time(transient_set)**
+##### **absorbing_time(transient_set)**
 Mean number of steps needed to leave the `transient_set`, return the `pykov.Vector()` `tau` where `tau[i]` is the mean number of steps needed to leave the transient set starting from state `i`. The parameter `transient_set` is a subset of states (iterable).
 ```python
 >>> d = {('R','R'):1./2, ('R','N'):1./4, ('R','S'):1./4,
